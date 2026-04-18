@@ -18,6 +18,7 @@ import { play } from './audio/sounds.js';
 import { CONFIG } from './config.js';
 import { loadLevel } from './world/level-loader.js';
 import { levels } from '../levels/index.js';
+import { spawnCoinBurst, tickCoinBurst } from './world/coin-burst.js';
 
 const EVENT_TELL_DUR = 1.0;
 
@@ -66,6 +67,7 @@ export function createGameState(initialLevelIdx = 0) {
     levelIdx: initialLevelIdx,
     lives: 5,
     coins: 0,
+    coinBurst: [],
     state: 'waiting',
     deathReason: null,
     animationDoneAt: 0,
@@ -276,6 +278,9 @@ export function tick(game, dt, keystate, camera) {
     advanceDefrag(defrag, dt);
   }
 
+  // Tick coin-burst particles (drifting coins from the last Sonic hit)
+  tickCoinBurst(game.coinBurst, dt, level.height);
+
   tickEnemies(game.enemies, dt, level);
   if (player.invulnTime > 0) player.invulnTime -= dt;
   if (player.invulnTime <= 0) {
@@ -377,6 +382,7 @@ function die(game, reason, camera) {
   // flicker invulnerability instead of taking a life.
   const isHit = reason === 'enemy' || reason === 'bad_sector' || reason === 'crushed';
   if (isHit && game.coins > 0) {
+    spawnCoinBurst(game.player.x, game.player.y, game.coins, game.coinBurst);
     game.coins = 0;
     game.player.invulnTime = 1.5;
     play('death');

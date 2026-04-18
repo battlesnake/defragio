@@ -24,10 +24,10 @@ export function createGridRenderer({ container, viewportCols, viewportRows, cell
   return { cells, viewportCols, viewportRows, cellWidth, cellHeight, grid };
 }
 
-// Paint order: tiles → defrag op tells → flush particles → enemies → player → HUD.
+// Paint order: tiles → defrag op tells → flush particles → coin burst → enemies → player → HUD.
 // Each particle maps to its containing cell (floor(x), floor(y)); when two
 // particles occupy the same cell, the one written later wins.
-export function paintGrid(renderer, level, camera, defrag, enemies = [], player = null, particles = null, coins = 0) {
+export function paintGrid(renderer, level, camera, defrag, enemies = [], player = null, particles = null, coins = 0, coinBurst = null) {
   const { cells, viewportCols, viewportRows } = renderer;
   const xOffset = camera.x;
 
@@ -69,6 +69,21 @@ export function paintGrid(renderer, level, camera, defrag, enemies = [], player 
       const localCol = worldCol - xOffset;
       if (localCol >= 0 && localCol < viewportCols && worldRow >= 0 && worldRow < viewportRows) {
         cells[worldRow * viewportCols + localCol].className = `cell ${cellClassFor(p.tileType)}`;
+      }
+    }
+  }
+
+  // 3b. Coin burst particles (gold cells flying out of the player)
+  if (coinBurst && coinBurst.length) {
+    const sx = CONFIG.CELL_W + CONFIG.CELL_GAP;
+    const sy = CONFIG.CELL_H + CONFIG.CELL_GAP;
+    for (const p of coinBurst) {
+      if (!p.alive) continue;
+      const worldCol = Math.floor(p.px / sx);
+      const worldRow = Math.floor(p.py / sy);
+      const localCol = worldCol - xOffset;
+      if (localCol >= 0 && localCol < viewportCols && worldRow >= 0 && worldRow < viewportRows) {
+        cells[worldRow * viewportCols + localCol].className = 'cell cell--coin';
       }
     }
   }
