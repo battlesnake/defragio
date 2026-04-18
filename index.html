@@ -30,10 +30,10 @@
           <div class="statusrow__progress"><div id="progress-bar"></div></div>
           <div class="statusrow__pct" id="status-pct">0% Complete</div>
           <div class="statusrow__btns">
-            <button class="btn" id="btn-stop"><u>S</u>top</button>
+            <button class="btn" id="btn-controls"><u>C</u>ontrols</button>
             <button class="btn" id="btn-pause"><u>P</u>ause</button>
             <button class="btn" id="btn-legend"><u>L</u>egend</button>
-            <button class="btn">Hide <u>D</u>etails</button>
+            <button class="btn" id="btn-about"><u>A</u>bout</button>
           </div>
         </div>
       </div>
@@ -47,18 +47,6 @@
         <div class="win__btn" id="legend-close">×</div>
       </div>
       <div class="win__body legend-modal__body">
-        <h3>How to play</h3>
-        <p>Reach the magenta <span class="legend-swatch swatch--goal"></span> goal stripe at the right edge of each level. Avoid bad sectors, watch for green/red flashes (terrain about to change), and don't fall into pits. Five levels.</p>
-
-        <h3>Controls</h3>
-        <ul class="legend-controls">
-          <li><b>Move</b>: ← → or A D</li>
-          <li><b>Jump</b>: ↑ / W / Space (tap again mid-air for double jump)</li>
-          <li><b>Drop / duck</b>: ↓ or S</li>
-          <li><b>Pause</b>: P, or click the Pause button</li>
-          <li><b>Legend</b>: click Legend; Esc to close</li>
-        </ul>
-
         <h3>Block legend</h3>
         <table class="legend-blocks">
           <tr><td><span class="legend-swatch swatch--cyan-solid"></span></td><td>Unoptimized data — defrag may move it</td></tr>
@@ -71,17 +59,62 @@
           <tr><td><span class="legend-swatch swatch--checkpoint"></span></td><td>Checkpoint — saves your respawn spot</td></tr>
           <tr><td><span class="legend-swatch swatch--fragile"></span></td><td>Fragile — cracks after one step</td></tr>
           <tr><td><span class="legend-swatch swatch--goal"></span></td><td>Goal cluster — touch to clear the level</td></tr>
-          <tr><td><span class="legend-swatch swatch--coin"></span></td><td>Coin — collect for 10 points</td></tr>
+          <tr><td><span class="legend-swatch swatch--coin"></span></td><td>Coin — collect (Sonic-style shield)</td></tr>
           <tr><td><span class="legend-swatch swatch--read"></span></td><td>Reading (green flash) — block about to disappear</td></tr>
           <tr><td><span class="legend-swatch swatch--write"></span></td><td>Writing (red flash) — empty space about to solidify</td></tr>
           <tr><td><span class="legend-swatch swatch--player"></span></td><td>You (the read head)</td></tr>
         </table>
-
         <p class="legend-foot">Each box represents one disk cluster.</p>
+      </div>
+    </div>
+  </div>
 
-        <div style="text-align: center; margin-top: 8px;">
-          <button class="btn" onclick="document.getElementById('legend-close').click()"><u>C</u>lose</button>
-        </div>
+  <div id="controls-modal" class="legend-modal" hidden>
+    <div class="legend-modal__bg"></div>
+    <div class="win legend-modal__win">
+      <div class="win__titlebar">
+        <div class="win__title">Controls &amp; Objective</div>
+        <div class="win__btn" id="controls-close">×</div>
+      </div>
+      <div class="win__body legend-modal__body">
+        <h3>Objective</h3>
+        <p>Reach the magenta <span class="legend-swatch swatch--goal"></span> goal stripe at the right edge of each level. Five levels in total. Coins act as a Sonic-style shield: with at least one collected, the next hit just costs your coins instead of a life.</p>
+
+        <h3>Controls</h3>
+        <ul class="legend-controls">
+          <li><b>Move</b>: ← → or A D</li>
+          <li><b>Jump</b>: ↑ / W / Space (tap again mid-air for a double jump)</li>
+          <li><b>Drop / duck</b>: ↓ or S</li>
+          <li><b>Pause</b>: P, or click the Pause button</li>
+          <li><b>Legend / About / Controls</b>: corresponding chrome buttons; Esc closes any popup</li>
+        </ul>
+
+        <h3>Watch for</h3>
+        <ul>
+          <li><b>Green flash</b>: a cell is being read — about to disappear</li>
+          <li><b>Red flash</b>: a free cell is being written — about to become solid (standing in it = crushed)</li>
+          <li>Over time, the back of the disk fills in. Don't dawdle and don't backtrack too far.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div id="about-modal" class="legend-modal" hidden>
+    <div class="legend-modal__bg"></div>
+    <div class="win legend-modal__win">
+      <div class="win__titlebar">
+        <div class="win__title">About</div>
+        <div class="win__btn" id="about-close">×</div>
+      </div>
+      <div class="win__body legend-modal__body">
+        <h3>Defrag</h3>
+        <p>A browser platformer themed as the Win98 Disk Defragmenter.</p>
+        <p>Built by <b>Mark Cowan</b>.</p>
+        <ul class="legend-controls">
+          <li>LinkedIn: <a href="https://www.linkedin.com/in/photonicist" target="_blank" rel="noopener">in/photonicist</a></li>
+          <li>GitHub: <a href="https://github.com/battlesnake" target="_blank" rel="noopener">battlesnake</a></li>
+          <li>Potamus: <a href="https://potamus.ee" target="_blank" rel="noopener">potamus.ee</a></li>
+        </ul>
       </div>
     </div>
   </div>

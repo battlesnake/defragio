@@ -1,35 +1,48 @@
-// Wires the chrome's Pause and Legend buttons to game logic + the legend modal.
+// Wires the chrome's Pause / Controls / Legend / About buttons.
 
 import { togglePause } from '../game.js';
 
+const MODALS = ['legend', 'controls', 'about'];
+
 let pauseBtn = null;
-let legendBtn = null;
-let stopBtn = null;
-let modal = null;
-let modalClose = null;
+const modalEls = {};
 
 export function bindButtons(game) {
-  pauseBtn   = document.getElementById('btn-pause');
-  legendBtn  = document.getElementById('btn-legend');
-  stopBtn    = document.getElementById('btn-stop');
-  modal      = document.getElementById('legend-modal');
-  modalClose = document.getElementById('legend-close');
+  pauseBtn = document.getElementById('btn-pause');
 
   if (pauseBtn) {
     pauseBtn.addEventListener('click', (e) => { togglePause(game); e.currentTarget.blur(); });
   }
-  if (legendBtn) {
-    legendBtn.addEventListener('click', (e) => { openLegend(game); e.currentTarget.blur(); });
+
+  for (const name of MODALS) {
+    const btn   = document.getElementById(`btn-${name}`);
+    const modal = document.getElementById(`${name}-modal`);
+    const close = document.getElementById(`${name}-close`);
+    modalEls[name] = modal;
+    if (btn && modal) {
+      btn.addEventListener('click', (e) => {
+        openModal(game, name);
+        e.currentTarget.blur();
+      });
+    }
+    if (close && modal) {
+      close.addEventListener('click', (e) => {
+        closeModal(game, name);
+        e.currentTarget.blur && e.currentTarget.blur();
+      });
+    }
   }
-  if (modalClose) {
-    modalClose.addEventListener('click', (e) => { closeLegend(game); e.currentTarget.blur && e.currentTarget.blur(); });
-  }
-  // Esc closes the legend
+
+  // Esc closes whichever modal is open.
   window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modal && !modal.hidden) closeLegend(game);
+    if (e.key !== 'Escape') return;
+    for (const name of MODALS) {
+      const m = modalEls[name];
+      if (m && !m.hidden) { closeModal(game, name); return; }
+    }
   });
-  // P toggles pause — but only mid-game (not during 'waiting' so the
-  // first input always starts the game; not during animation states).
+
+  // P toggles pause — only mid-game / mid-pause.
   window.addEventListener('keydown', (e) => {
     if (e.key === 'p' || e.key === 'P') {
       if (game.state === 'playing' || game.state === 'paused') togglePause(game);
@@ -37,20 +50,28 @@ export function bindButtons(game) {
   });
 }
 
-function openLegend(game) {
+function openModal(game, name) {
+  // Close any other open modal first.
+  for (const other of MODALS) {
+    if (other !== name && modalEls[other] && !modalEls[other].hidden) {
+      closeModal(game, other);
+    }
+  }
+  const modal = modalEls[name];
   if (!modal) return;
   modal.hidden = false;
   if (game.state !== 'paused') {
-    game.pausedFromLegend = true;
+    game.pausedFromModal = true;
     togglePause(game);
   }
 }
 
-function closeLegend(game) {
+function closeModal(game, name) {
+  const modal = modalEls[name];
   if (!modal) return;
   modal.hidden = true;
-  if (game.pausedFromLegend) {
-    game.pausedFromLegend = false;
+  if (game.pausedFromModal) {
+    game.pausedFromModal = false;
     togglePause(game);
   }
 }

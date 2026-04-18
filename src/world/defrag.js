@@ -17,6 +17,13 @@ const BAND_BEHIND = 1;
 const READ_BIAS_AHEAD = 6;   // reads prefer cells this far ahead of front
 const WRITE_BIAS_AT_FRONT = 2;
 
+// Backfill: cells far behind the front fill in over time. Rate grows with
+// game time so eventually the entire back of the disk reaches density 1.
+// Player who backtracks too far gets crushed.
+const BACKFILL_RATE_BASE   = 1.0;   // writes per second at t=0
+const BACKFILL_RATE_GROWTH = 0.06;  // exponential coefficient (per second)
+const BACKFILL_OFFSET      = 4;     // cells behind front to start filling
+
 function makeRng(seed) {
   let a = seed >>> 0;
   return () => {
@@ -90,6 +97,32 @@ export function advanceDefrag(defrag, dt) {
     scheduleOp(defrag);
     defrag.nextOpAt = defrag.t + OP_INTERVAL_MIN + defrag.rng() * (OP_INTERVAL_MAX - OP_INTERVAL_MIN);
   }
+
+  // Backfill timer
+  defrag.backfillT = (defrag.backfillT ?? 0) + dt;
+  const rate = BACKFILL_RATE_BASE * Math.exp(BACKFILL_RATE_GROWTH * defrag.t);
+  const interval = 1 / rate;
+  while (defrag.backfillT >= interval) {
+    defrag.backfillT -= interval;
+    scheduleBackfill(defrag);
+  }
+}
+
+function scheduleBackfill(defrag) {
+  const { level, front, rng } = defrag;
+  const right = Math.max(0, Math.floor(front) - BACKFILL_OFFSET);
+  if (right <= 0) return;
+  // Random free cell in [0, right)
+  const col = Math.floor(rng() * right);
+  const row = Math.floor(rng() * level.height);
+  if (level.tiles[row][col] !== TILE.FREE) return;
+  defrag.ops.push({
+    type: 'write',
+    cells: [{ row, col }],
+    scheduledAt: defrag.t,
+    completeAt: defrag.t + WRITE_DURATION,
+    applied: false,
+  });
 }
 
 function scheduleOp(defrag) {

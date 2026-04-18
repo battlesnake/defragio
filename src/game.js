@@ -262,6 +262,13 @@ export function tick(game, dt, keystate, camera) {
   integrate(player, dt);
   resolveCollisions(player, level);
 
+  // Viewport left-edge clamp: can't walk off the left side of the visible
+  // grid (since the camera doesn't scroll back).
+  if (camera && player.x < camera.x + 0.5) {
+    player.x = camera.x + 0.5;
+    if (player.vx < 0) player.vx = 0;
+  }
+
   if (wasOnGround && !player.onGround) recordLeftGround(jumpBuffer, game.t);
   if (!wasOnGround && player.onGround) player.airJumpsUsed = 0;
 
