@@ -23,8 +23,10 @@ export function createGridRenderer({ container, viewportCols, viewportRows, cell
   return { cells, viewportCols, viewportRows, cellWidth, cellHeight, grid };
 }
 
-// Paint order: tiles → defrag op cells (read/write tells) → enemies → player.
-export function paintGrid(renderer, level, camera, defrag, enemies = [], player = null) {
+// Paint order: tiles → defrag op tells → flush particles → enemies → player.
+// Each particle maps to its containing cell (floor(x), floor(y)); when two
+// particles occupy the same cell, the one written later wins.
+export function paintGrid(renderer, level, camera, defrag, enemies = [], player = null, particles = null) {
   const { cells, viewportCols, viewportRows } = renderer;
   const xOffset = camera.x;
 
@@ -53,7 +55,20 @@ export function paintGrid(renderer, level, camera, defrag, enemies = [], player 
     }
   }
 
-  // 3. Enemies
+  // 3. Flush particles (overwrite tile underneath with the particle's tile type)
+  if (particles) {
+    for (const p of particles) {
+      if (!p.alive) continue;
+      const worldCol = Math.floor(p.x);
+      const worldRow = Math.floor(p.y);
+      const localCol = worldCol - xOffset;
+      if (localCol >= 0 && localCol < viewportCols && worldRow >= 0 && worldRow < viewportRows) {
+        cells[worldRow * viewportCols + localCol].className = `cell ${cellClassFor(p.tileType)}`;
+      }
+    }
+  }
+
+  // 4. Enemies
   for (const e of enemies) {
     if (!e.alive) continue;
     const worldCol = Math.floor(e.x);
@@ -64,7 +79,7 @@ export function paintGrid(renderer, level, camera, defrag, enemies = [], player 
     }
   }
 
-  // 4. Player on top
+  // 5. Player on top
   if (player) {
     const worldCol = Math.floor(player.x);
     const worldRow = Math.floor(player.y);

@@ -3,7 +3,11 @@ import { applyGravity, integrate, applyHorizontalIntent } from './player/physics
 import { startJump, releaseJump } from './player/jump.js';
 import { resolveCollisions } from './world/collision.js';
 import { createDefrag, advanceDefrag } from './world/defrag.js';
-import { startDeathAnimation, startWinAnimation } from './world/animations.js';
+import {
+  startDeathAnimation,
+  startFlushAnimation, tickFlush, isFlushDone,
+  startDefragInAnimation,
+} from './world/animations/index.js';
 import { createJumpBuffer, recordJumpPress, recordLeftGround, tickBuffer, canJump, clearJump } from './input/buffer.js';
 import { consumeEdges } from './input/keystate.js';
 import { isLethal, isCheckpoint, isGoal } from './world/tile.js';
@@ -19,6 +23,13 @@ function restoreTiles(level, snapshot) {
   for (let r = 0; r < snapshot.length; r++) {
     for (let c = 0; c < snapshot[r].length; c++) {
       level.tiles[r][c] = snapshot[r][c];
+    }
+  }
+}
+function clearTiles(level) {
+  for (let r = 0; r < level.height; r++) {
+    for (let c = 0; c < level.width; c++) {
+      level.tiles[r][c] = 0; // TILE.FREE
     }
   }
 }
@@ -43,17 +54,49 @@ export function createGameState(level) {
     state: 'playing',
     deathReason: null,
     animationDoneAt: 0,
+    flush: null,
   };
 }
 
 export function tick(game, dt, keystate) {
-  // While dying / won, run the animation but skip player + input + enemy ticks.
-  if (game.state === 'dying' || game.state === 'won') {
+  // Death animation phase
+  if (game.state === 'dying') {
+    game.t += dt;
+    advanceDefrag(game.defrag, dt);
+    if (game.t >= game.animationDoneAt) respawnOrGameOver(game);
+    return;
+  }
+
+  // Win → flush vortex phase
+  if (game.state === 'flushing') {
+    game.t += dt;
+    tickFlush(game.flush, dt);
+    if (isFlushDone(game)) {
+      game.state = 'defragging-in';
+      startDefragInAnimation(game);
+    }
+    return;
+  }
+
+  // Defrag-in phase: write the next level back in
+  if (game.state === 'defragging-in') {
     game.t += dt;
     advanceDefrag(game.defrag, dt);
     if (game.t >= game.animationDoneAt) {
-      if (game.state === 'dying') respawnOrGameOver(game);
-      else game.state = 'won-final';
+      // Loop level 1 for now (no level 2 yet)
+      game.flush = null;
+      game.player = createPlayer(game.level.playerStart);
+      game.defrag = createDefrag({
+        levelId: game.level.id,
+        level: game.level,
+        speed: game.level.cursorSpeed,
+        initialOffset: CONFIG.CURSOR_INITIAL_OFFSET,
+      });
+      game.jumpBuffer = createJumpBuffer();
+      game.enemies = spawnEnemies(game.level);
+      game.checkpoints = createCheckpointTracker(game.level.playerStart);
+      game.t = 0;
+      game.state = 'playing';
     }
     return;
   }
@@ -144,8 +187,8 @@ function die(game, reason) {
 function win(game) {
   if (game.state !== 'playing') return;
   play('levelComplete');
-  game.state = 'won';
-  startWinAnimation(game);
+  game.state = 'flushing';
+  startFlushAnimation(game);
 }
 
 function respawnOrGameOver(game) {

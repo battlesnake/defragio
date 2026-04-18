@@ -70,8 +70,12 @@ export function advanceDefrag(defrag, dt) {
   // Apply ops whose tell phase is over (mutate the level)
   for (const op of defrag.ops) {
     if (!op.applied && defrag.t >= op.completeAt) {
-      for (const { row, col } of op.cells) {
-        defrag.level.tiles[row][col] = (op.type === 'read') ? TILE.FREE : TILE.CYAN_SOLID;
+      for (const c of op.cells) {
+        if (op.type === 'read') {
+          defrag.level.tiles[c.row][c.col] = TILE.FREE;
+        } else {
+          defrag.level.tiles[c.row][c.col] = c.targetType ?? TILE.CYAN_SOLID;
+        }
       }
       op.applied = true;
     }
