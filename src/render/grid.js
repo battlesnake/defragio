@@ -43,7 +43,28 @@ export function paintGrid(renderer, level, camera, defrag, enemies = [], player 
     }
   }
 
-  // 2. Defrag op tells (read/write flashes; cells are still solid/free per tile during the tell)
+  // 2a. Consumed zone (everything left of the front) tinted dark
+  if (defrag && defrag.front > 0) {
+    const frontCol = Math.floor(defrag.front);
+    for (let r = 0; r < viewportRows; r++) {
+      for (let c = 0; c < viewportCols; c++) {
+        const worldCol = xOffset + c;
+        if (worldCol < 0 || worldCol >= frontCol) break;
+        cells[r * viewportCols + c].className = 'cell cell--consumed';
+      }
+    }
+  }
+  // 2b. Defrag front (red-bordered dark column at the leading edge)
+  if (defrag && defrag.front >= 0) {
+    const frontCol = Math.floor(defrag.front);
+    const localFront = frontCol - xOffset;
+    if (localFront >= 0 && localFront < viewportCols) {
+      for (let r = 0; r < viewportRows; r++) {
+        cells[r * viewportCols + localFront].className = 'cell cell--front';
+      }
+    }
+  }
+  // 2c. Defrag op tells (read/write flashes; on top of front/consumed)
   if (defrag) {
     for (let r = 0; r < viewportRows; r++) {
       for (let c = 0; c < viewportCols; c++) {

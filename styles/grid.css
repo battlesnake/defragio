@@ -80,6 +80,19 @@
   50% { background: #88ff88; box-shadow: 0 0 6px 2px #88ff88; }
 }
 
+/* Defrag completion frontier — vertical column showing where the operation
+   has reached. Anything to its left is dead zone (instant death).
+   Tinted dark gray so it reads as "consumed" terrain. */
+.cell--front {
+  background: #404040;
+  border-color: #d80000;
+  box-shadow: inset 1px 0 0 #ff0000, inset -1px 0 0 #ff0000;
+}
+.cell--consumed {
+  background: rgba(0, 0, 0, 0.45);
+  border-color: #303030;
+}
+
 /* Goal */
 .cell--goal {
   background: repeating-linear-gradient(45deg, #ff00ff 0 2px, #800080 2px 3px);
