@@ -67,3 +67,4 @@ export const cellClassFor = (t) => TILE_TO_CLASS[t] || 'cell--free';
 export const isCheckpoint = (t) => t === TILE.CHECKPOINT;
 export const isGoal       = (t) => t === TILE.GOAL;
 export const isCoin       = (t) => t === TILE.COIN;
+export const isFragile    = (t) => t === TILE.FRAGILE;

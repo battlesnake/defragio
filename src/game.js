@@ -11,7 +11,7 @@ import {
 } from './world/animations/index.js';
 import { createJumpBuffer, recordJumpPress, recordLeftGround, tickBuffer, canJump, clearJump, inCoyote } from './input/buffer.js';
 import { consumeEdges } from './input/keystate.js';
-import { isLethal, isCheckpoint, isGoal, isCoin, TILE } from './world/tile.js';
+import { isLethal, isCheckpoint, isGoal, isCoin, isFragile, isSolid, TILE } from './world/tile.js';
 import { createCheckpointTracker, recordCheckpoint, lastCheckpoint } from './world/checkpoint.js';
 import { spawnEnemies, tickEnemies } from './enemies/registry.js';
 import { play } from './audio/sounds.js';
@@ -52,6 +52,7 @@ function freshLevelState(level) {
     checkpoints: createCheckpointTracker(level.playerStart),
     enemies: spawnEnemies(level),
     pendingEvents: pendingEvents(level),
+    fragileTimers: new Map(),
     t: 0,
   };
 }
@@ -279,14 +280,31 @@ export function tick(game, dt, keystate, camera) {
     }
   }
 
+  // Touch detection — checks every cell the player's AABB overlaps,
+  // PLUS the cell directly under their feet (so standing on a B sector kills).
+  const yT = Math.floor(player.y - 0.5 + 0.01);
+  const yB = Math.floor(player.y + 0.5 - 0.01);
+  const xL = Math.floor(player.x - 0.5 + 0.01);
+  const xR = Math.floor(player.x + 0.5 - 0.01);
+  const feetRow = Math.floor(player.y + 0.5 + 0.01);
   const cellRow = Math.floor(player.y);
   const cellCol = Math.floor(player.x);
-  if (cellRow >= 0 && cellRow < level.height && cellCol >= 0 && cellCol < level.width) {
-    const here = level.tiles[cellRow][cellCol];
-    if (isLethal(here)) {
+
+  // Lethality check: any AABB cell or feet cell that's lethal kills.
+  const lethalChecks = [
+    [yT, xL], [yT, xR], [yB, xL], [yB, xR],
+    [feetRow, xL], [feetRow, xR],
+  ];
+  for (const [r, c] of lethalChecks) {
+    if (r < 0 || r >= level.height || c < 0 || c >= level.width) continue;
+    if (isLethal(level.tiles[r][c])) {
       die(game, 'bad_sector', camera);
       return;
     }
+  }
+
+  if (cellRow >= 0 && cellRow < level.height && cellCol >= 0 && cellCol < level.width) {
+    const here = level.tiles[cellRow][cellCol];
     if (isCheckpoint(here)) {
       recordCheckpoint(game.checkpoints, { row: cellRow, col: cellCol });
     }
@@ -298,12 +316,34 @@ export function tick(game, dt, keystate, camera) {
       win(game, camera);
       return;
     }
-    // Death-by-write: a write op completed inside the player's cell.
-    // (isLethal would have caught BAD already; isSolid here means a non-lethal
-    // solid tile materialised on top of us — being embedded in solid is fatal.)
+    // Death-by-write: a non-lethal solid tile materialised on top of us.
     if (isSolid(here)) {
       die(game, 'crushed', camera);
       return;
+    }
+  }
+
+  // Fragile cracking: cells under the player's feet that are FRAGILE start
+  // a 0.5s timer; when it expires the cell becomes free (player falls
+  // through). The timer is per-cell and only set on first touch.
+  if (feetRow >= 0 && feetRow < level.height) {
+    for (let c = xL; c <= xR; c++) {
+      if (c < 0 || c >= level.width) continue;
+      if (isFragile(level.tiles[feetRow][c])) {
+        const key = feetRow * 10000 + c;
+        if (!game.fragileTimers.has(key)) {
+          game.fragileTimers.set(key, game.t + 0.5);
+        }
+      }
+    }
+  }
+  // Process expiring fragile cells.
+  for (const [key, expiresAt] of game.fragileTimers) {
+    if (game.t >= expiresAt) {
+      const r = Math.floor(key / 10000);
+      const c = key - r * 10000;
+      if (level.tiles[r][c] === TILE.FRAGILE) level.tiles[r][c] = TILE.FREE;
+      game.fragileTimers.delete(key);
     }
   }
 
