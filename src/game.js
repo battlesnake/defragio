@@ -360,8 +360,9 @@ function die(game, reason, camera) {
   game.deathReason = reason;
   game.deathCamera = camera;
 
-  if (reason === 'enemy') {
-    // Mario-style: bounce up, fall through the level, then morph to YOU LOSE.
+  if (reason !== 'fell') {
+    // Mario-style: bounce up, fall through the level, then morph to text.
+    // Skipped only when the player is already falling off the bottom.
     game.state = 'death-bounce';
     game.player.vx = 0;
     game.player.vy = -28;
