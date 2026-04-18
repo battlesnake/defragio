@@ -63,7 +63,7 @@ export function createGameState(initialLevelIdx = 0) {
     levels,
     levelIdx: initialLevelIdx,
     lives: 3,
-    state: 'playing',
+    state: 'waiting',
     deathReason: null,
     animationDoneAt: 0,
     flush: null,
@@ -98,6 +98,15 @@ function processEvents(game) {
 }
 
 export function tick(game, dt, keystate, camera) {
+  // Waiting for the player to press a key before any timers run.
+  if (game.state === 'waiting') {
+    const k = keystate.pressed;
+    if (k.has('left') || k.has('right') || k.has('jump') || k.has('drop')) {
+      game.state = 'playing';
+    }
+    return;
+  }
+
   // Mario-style enemy-hit bounce: player flies up, then falls off the map.
   // No collision, no enemies, no defrag during the bounce.
   if (game.state === 'death-bounce') {
@@ -153,7 +162,7 @@ export function tick(game, dt, keystate, camera) {
       transitionToLevel(game, game._pendingNextIdx ?? game.levelIdx);
       game._pendingNextIdx = null;
       game.player.invulnTime = 1.0;
-      game.state = 'playing';
+      game.state = 'waiting';
     }
     return;
   }
