@@ -98,7 +98,20 @@ function processEvents(game) {
 }
 
 export function tick(game, dt, keystate, camera) {
-  // Death animation phase
+  // Mario-style enemy-hit bounce: player flies up, then falls off the map.
+  // No collision, no enemies, no defrag during the bounce.
+  if (game.state === 'death-bounce') {
+    game.t += dt;
+    applyGravity(game.player, dt);
+    integrate(game.player, dt);
+    if (game.player.y > game.level.height + 5) {
+      game.state = 'dying';
+      startDeathAnimation(game, game.deathCamera);
+    }
+    return;
+  }
+
+  // Death-text morph phase
   if (game.state === 'dying') {
     game.t += dt;
     advanceDefrag(game.defrag, dt);
@@ -230,6 +243,18 @@ function die(game, reason, camera) {
   game.lives -= 1;
   play('death');
   game.deathReason = reason;
+  game.deathCamera = camera;
+
+  if (reason === 'enemy') {
+    // Mario-style: bounce up, fall through the level, then morph to YOU LOSE.
+    game.state = 'death-bounce';
+    game.player.vx = 0;
+    game.player.vy = -28;
+    game.player.onGround = false;
+    game.player.jumping = false;
+    game.player.invulnTime = 1e9;
+    return;
+  }
   game.state = 'dying';
   startDeathAnimation(game, camera);
 }

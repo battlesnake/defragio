@@ -45,7 +45,7 @@ function frame(now) {
   }
   prevState = game.state;
   updateCamera(camera, game.player, game.level.width);
-  const showActors = game.state === 'playing';
+  const showActors = game.state === 'playing' || game.state === 'death-bounce';
   const particles = game.state === 'flushing' && game.flush ? game.flush.particles : null;
   paintGrid(
     renderer,
