@@ -15,9 +15,9 @@ export function spawnEnemies(level) {
   });
 }
 
-export function tickEnemies(enemies, dt) {
+export function tickEnemies(enemies, dt, level) {
   for (const e of enemies) {
     const t = TICKERS[e.type];
-    if (t) t(e, dt);
+    if (t) t(e, dt, level);
   }
 }

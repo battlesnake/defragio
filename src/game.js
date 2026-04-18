@@ -266,7 +266,7 @@ export function tick(game, dt, keystate, camera) {
     advanceDefrag(defrag, dt);
   }
 
-  tickEnemies(game.enemies, dt);
+  tickEnemies(game.enemies, dt, level);
   if (player.invulnTime > 0) player.invulnTime -= dt;
   if (player.invulnTime <= 0) {
     for (const e of game.enemies) {
