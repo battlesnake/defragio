@@ -34,21 +34,38 @@ export default {
   // out from under the player. Two-row reads (cols 13 and 14) so the
   // pit goes to the bottom row visually.
   events: [
-    { time: 4.0,  type: 'read', cells: [
-      { row: 13, col: 14 }, { row: 13, col: 15 },
-      { row: 14, col: 14 }, { row: 14, col: 15 },
+    // World-falling-apart cadence: a chunk of floor reads away every ~1.2s.
+    { time: 3.0, type: 'read', cells: [
+      { row: 13, col: 10 }, { row: 13, col: 11 },
+      { row: 14, col: 10 }, { row: 14, col: 11 },
     ] },
-    { time: 6.0,  type: 'read', cells: [
+    { time: 4.2, type: 'read', cells: [
+      { row: 13, col: 16 }, { row: 13, col: 17 },
+      { row: 14, col: 16 }, { row: 14, col: 17 },
+    ] },
+    { time: 5.3, type: 'read', cells: [
       { row: 13, col: 22 }, { row: 13, col: 23 }, { row: 13, col: 24 },
       { row: 14, col: 22 }, { row: 14, col: 23 }, { row: 14, col: 24 },
     ] },
-    { time: 8.5,  type: 'read', cells: [
-      { row: 13, col: 34 }, { row: 13, col: 35 },
-      { row: 14, col: 34 }, { row: 14, col: 35 },
+    { time: 6.5, type: 'read', cells: [
+      { row: 13, col: 28 }, { row: 13, col: 29 },
+      { row: 14, col: 28 }, { row: 14, col: 29 },
     ] },
-    { time: 11.0, type: 'read', cells: [
+    { time: 7.6, type: 'read', cells: [
+      { row: 13, col: 33 }, { row: 13, col: 34 }, { row: 13, col: 35 },
+      { row: 14, col: 33 }, { row: 14, col: 34 }, { row: 14, col: 35 },
+    ] },
+    { time: 8.8, type: 'read', cells: [
+      { row: 13, col: 39 }, { row: 13, col: 40 },
+      { row: 14, col: 39 }, { row: 14, col: 40 },
+    ] },
+    { time: 10.0, type: 'read', cells: [
       { row: 13, col: 44 }, { row: 13, col: 45 }, { row: 13, col: 46 },
       { row: 14, col: 44 }, { row: 14, col: 45 }, { row: 14, col: 46 },
+    ] },
+    { time: 11.2, type: 'read', cells: [
+      { row: 13, col: 50 }, { row: 13, col: 51 },
+      { row: 14, col: 50 }, { row: 14, col: 51 },
     ] },
   ],
 };

@@ -72,6 +72,24 @@ export function createGameState(initialLevelIdx = 0) {
   };
 }
 
+// Cheat: skip directly to another level. delta = +1 / -1.
+// If we go past the last level, trigger the YOU WIN finale.
+export function cheatJumpLevel(game, delta) {
+  let newIdx = game.levelIdx + delta;
+  if (newIdx >= game.levels.length) {
+    const lvl = game.level;
+    for (let r = 0; r < lvl.height; r++) {
+      for (let c = 0; c < lvl.width; c++) lvl.tiles[r][c] = 0;
+    }
+    game.state = 'final-winning';
+    startFinalWinAnimation(game, null);
+    return;
+  }
+  if (newIdx < 0) newIdx = 0;
+  transitionToLevel(game, newIdx);
+  game.state = 'waiting';
+}
+
 function transitionToLevel(game, idx) {
   const wrappedIdx = idx % game.levels.length;
   const level = loadLevel(game.levels[wrappedIdx]);

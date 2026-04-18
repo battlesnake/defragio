@@ -62,14 +62,34 @@ export default {
     { time: 4.5, type: 'write', cells: [
       { row: 13, col: 41 }, { row: 13, col: 42 },
     ] },
-    // Decay events on the floor (reads) creating fresh pits as you go
-    { time: 7.0, type: 'read', cells: [
+    // World-falling-apart decay: a chunk of floor reads away every ~1.0s.
+    { time: 5.5, type: 'read', cells: [
+      { row: 13, col: 6 }, { row: 13, col: 7 },
+      { row: 14, col: 6 }, { row: 14, col: 7 },
+    ] },
+    { time: 6.5, type: 'read', cells: [
       { row: 13, col: 14 }, { row: 13, col: 15 },
       { row: 14, col: 14 }, { row: 14, col: 15 },
     ] },
-    { time: 9.0, type: 'read', cells: [
+    { time: 7.5, type: 'read', cells: [
+      { row: 13, col: 18 }, { row: 13, col: 19 }, { row: 13, col: 20 },
+      { row: 14, col: 18 }, { row: 14, col: 19 }, { row: 14, col: 20 },
+    ] },
+    { time: 8.5, type: 'read', cells: [
+      { row: 13, col: 28 }, { row: 13, col: 29 },
+      { row: 14, col: 28 }, { row: 14, col: 29 },
+    ] },
+    { time: 9.5, type: 'read', cells: [
       { row: 13, col: 32 }, { row: 13, col: 33 },
       { row: 14, col: 32 }, { row: 14, col: 33 },
+    ] },
+    { time: 10.5, type: 'read', cells: [
+      { row: 13, col: 37 }, { row: 13, col: 38 }, { row: 13, col: 39 },
+      { row: 14, col: 37 }, { row: 14, col: 38 }, { row: 14, col: 39 },
+    ] },
+    { time: 11.5, type: 'read', cells: [
+      { row: 13, col: 45 }, { row: 13, col: 46 },
+      { row: 14, col: 45 }, { row: 14, col: 46 },
     ] },
   ],
 };
