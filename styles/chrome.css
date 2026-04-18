@@ -18,9 +18,9 @@
 }
 .win__icon {
   width: 16px; height: 16px;
-  background: linear-gradient(#fff 0 25%, #c0c0c0 25% 75%, #808080 75%);
-  border: 1px solid #000;
+  background: url('../assets/defrag-icon.webp') center/contain no-repeat;
   margin-right: 4px;
+  image-rendering: pixelated;
 }
 .win__title { flex: 1; padding-left: 2px; }
 .win__btn {
