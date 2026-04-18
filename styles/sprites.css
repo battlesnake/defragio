@@ -1,0 +1,20 @@
+.sprite {
+  position: absolute;
+  pointer-events: none;
+  image-rendering: pixelated;
+}
+.sprite--player {
+  background: #ffff00;
+  border: 1px solid #806000;
+  box-shadow: 0 0 0 1px #ffff00;
+  z-index: 5;
+}
+.sprite--cursor {
+  position: absolute;
+  background: #00ff00;
+  border: 1px solid #008800;
+  box-shadow: 0 0 4px 1px #00ff00, inset 0 0 0 1px #ccffcc;
+  animation: cursorPulse 0.4s steps(2) infinite;
+  z-index: 4;
+}
+.sprite--enemy { z-index: 4; }
