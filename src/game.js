@@ -298,6 +298,13 @@ export function tick(game, dt, keystate, camera) {
       win(game, camera);
       return;
     }
+    // Death-by-write: a write op completed inside the player's cell.
+    // (isLethal would have caught BAD already; isSolid here means a non-lethal
+    // solid tile materialised on top of us — being embedded in solid is fatal.)
+    if (isSolid(here)) {
+      die(game, 'crushed', camera);
+      return;
+    }
   }
 
   if (player.y > level.height + 2) {
