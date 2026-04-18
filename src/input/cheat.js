@@ -6,7 +6,7 @@ import { cheatJumpLevel } from '../game.js';
 
 const MAX_BUFFER = 16;
 
-export function attachCheatListener(game, target = window) {
+export function attachCheatListener(game, camera, target = window) {
   let buffer = '';
   let unlocked = false;
 
@@ -16,7 +16,7 @@ export function attachCheatListener(game, target = window) {
     // Level-skip keys, only after blyat has been entered.
     if (unlocked && (e.key === '[' || e.key === ']')) {
       e.preventDefault();
-      cheatJumpLevel(game, e.key === ']' ? +1 : -1);
+      cheatJumpLevel(game, e.key === ']' ? +1 : -1, camera);
       return;
     }
 

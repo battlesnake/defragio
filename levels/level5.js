@@ -23,7 +23,7 @@ export default {
       [4, '.'],                       // pit 22-25
       [4, '~'], [1, 'B'], [3, '~'],   // 8 (cols 26-33)
       [3, '.'],                       // pit 34-36
-      [4, '~'], [1, 'B'], [8, '~'],   // 13 (cols 37-49)
+      [4, '~'], [1, 'B'], [8, '~'],   // bad sector at col 41
       [7, '~'],                       // floor 50-56
       [3, 'G'],                       // goal 57-59
     ]),
@@ -55,41 +55,42 @@ export default {
     { type: 'virus', cell: { row: 12, col: 46 }, patrol: { from: 42, to: 50 } },
   ],
   events: [
-    // Bridges (writes) over the wider mid pits
-    { time: 3.5, type: 'write', cells: [
+    // Bridges (writes) over the wider mid pits — appear early so player isn't waiting
+    { time: 1.5, type: 'write', cells: [
       { row: 13, col: 25 }, { row: 13, col: 26 }, { row: 13, col: 27 },
     ] },
-    { time: 4.5, type: 'write', cells: [
-      { row: 13, col: 41 }, { row: 13, col: 42 },
-    ] },
-    // World-falling-apart decay: a chunk of floor reads away every ~1.0s.
-    { time: 5.5, type: 'read', cells: [
+    // Falling-apart decay: floor chunks read away every ~0.6s.
+    { time: 1.5, type: 'read', cells: [
       { row: 13, col: 6 }, { row: 13, col: 7 },
       { row: 14, col: 6 }, { row: 14, col: 7 },
     ] },
-    { time: 6.5, type: 'read', cells: [
+    { time: 2.1, type: 'read', cells: [
       { row: 13, col: 14 }, { row: 13, col: 15 },
       { row: 14, col: 14 }, { row: 14, col: 15 },
     ] },
-    { time: 7.5, type: 'read', cells: [
+    { time: 2.7, type: 'read', cells: [
       { row: 13, col: 18 }, { row: 13, col: 19 }, { row: 13, col: 20 },
       { row: 14, col: 18 }, { row: 14, col: 19 }, { row: 14, col: 20 },
     ] },
-    { time: 8.5, type: 'read', cells: [
+    { time: 3.3, type: 'read', cells: [
       { row: 13, col: 28 }, { row: 13, col: 29 },
       { row: 14, col: 28 }, { row: 14, col: 29 },
     ] },
-    { time: 9.5, type: 'read', cells: [
+    { time: 3.9, type: 'read', cells: [
       { row: 13, col: 32 }, { row: 13, col: 33 },
       { row: 14, col: 32 }, { row: 14, col: 33 },
     ] },
-    { time: 10.5, type: 'read', cells: [
+    { time: 4.5, type: 'read', cells: [
       { row: 13, col: 37 }, { row: 13, col: 38 }, { row: 13, col: 39 },
       { row: 14, col: 37 }, { row: 14, col: 38 }, { row: 14, col: 39 },
     ] },
-    { time: 11.5, type: 'read', cells: [
+    { time: 6.0, type: 'read', cells: [
       { row: 13, col: 45 }, { row: 13, col: 46 },
       { row: 14, col: 45 }, { row: 14, col: 46 },
+    ] },
+    { time: 6.6, type: 'read', cells: [
+      { row: 13, col: 51 }, { row: 13, col: 52 },
+      { row: 14, col: 51 }, { row: 14, col: 52 },
     ] },
   ],
 };

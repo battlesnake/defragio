@@ -6,6 +6,7 @@ import { bindChrome, updateChrome } from './render/chrome.js';
 import { loadSounds } from './audio/sounds.js';
 import { createKeyState, attachKeyState } from './input/keystate.js';
 import { attachCheatListener } from './input/cheat.js';
+import { bindButtons, syncPauseButton } from './render/buttons.js';
 
 const game = createGameState();
 
@@ -21,8 +22,9 @@ const camera = createCamera();
 
 const keystate = createKeyState();
 attachKeyState(keystate);
-attachCheatListener(game);
+attachCheatListener(game, camera);
 bindChrome();
+bindButtons(game);
 loadSounds({
   death:         'assets/audio/death.wav',
   levelComplete: 'assets/audio/level-complete.wav',
@@ -61,6 +63,7 @@ function frame(now) {
     particles,
   );
   updateChrome(game);
+  syncPauseButton(game);
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);

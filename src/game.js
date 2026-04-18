@@ -74,7 +74,7 @@ export function createGameState(initialLevelIdx = 0) {
 
 // Cheat: skip directly to another level. delta = +1 / -1.
 // If we go past the last level, trigger the YOU WIN finale.
-export function cheatJumpLevel(game, delta) {
+export function cheatJumpLevel(game, delta, camera) {
   let newIdx = game.levelIdx + delta;
   if (newIdx >= game.levels.length) {
     const lvl = game.level;
@@ -82,12 +82,22 @@ export function cheatJumpLevel(game, delta) {
       for (let c = 0; c < lvl.width; c++) lvl.tiles[r][c] = 0;
     }
     game.state = 'final-winning';
-    startFinalWinAnimation(game, null);
+    startFinalWinAnimation(game, camera);
     return;
   }
   if (newIdx < 0) newIdx = 0;
   transitionToLevel(game, newIdx);
   game.state = 'waiting';
+}
+
+export function togglePause(game) {
+  if (game.state === 'paused') {
+    game.state = game.pausedFrom || 'playing';
+    game.pausedFrom = null;
+  } else if (game.state === 'playing' || game.state === 'waiting') {
+    game.pausedFrom = game.state;
+    game.state = 'paused';
+  }
 }
 
 function transitionToLevel(game, idx) {
@@ -118,6 +128,9 @@ function processEvents(game) {
 }
 
 export function tick(game, dt, keystate, camera) {
+  // Frozen — Pause button or Legend modal pressed.
+  if (game.state === 'paused') return;
+
   // Waiting for the player to press a key before any timers run.
   if (game.state === 'waiting') {
     const k = keystate.pressed;

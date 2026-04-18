@@ -34,38 +34,48 @@ export default {
   // out from under the player. Two-row reads (cols 13 and 14) so the
   // pit goes to the bottom row visually.
   events: [
-    // World-falling-apart cadence: a chunk of floor reads away every ~1.2s.
-    { time: 3.0, type: 'read', cells: [
-      { row: 13, col: 10 }, { row: 13, col: 11 },
-      { row: 14, col: 10 }, { row: 14, col: 11 },
+    // Falling-apart cadence: floor chunks read away every ~0.6s.
+    // First few chunks fire EARLY (ahead of the player) so chasm-pits already
+    // exist when they arrive.
+    { time: 1.0, type: 'read', cells: [
+      { row: 13, col: 8 },  { row: 13, col: 9 },
+      { row: 14, col: 8 },  { row: 14, col: 9 },
     ] },
-    { time: 4.2, type: 'read', cells: [
-      { row: 13, col: 16 }, { row: 13, col: 17 },
-      { row: 14, col: 16 }, { row: 14, col: 17 },
+    { time: 1.6, type: 'read', cells: [
+      { row: 13, col: 14 }, { row: 13, col: 15 },
+      { row: 14, col: 14 }, { row: 14, col: 15 },
     ] },
-    { time: 5.3, type: 'read', cells: [
-      { row: 13, col: 22 }, { row: 13, col: 23 }, { row: 13, col: 24 },
-      { row: 14, col: 22 }, { row: 14, col: 23 }, { row: 14, col: 24 },
+    { time: 2.2, type: 'read', cells: [
+      { row: 13, col: 20 }, { row: 13, col: 21 }, { row: 13, col: 22 },
+      { row: 14, col: 20 }, { row: 14, col: 21 }, { row: 14, col: 22 },
     ] },
-    { time: 6.5, type: 'read', cells: [
-      { row: 13, col: 28 }, { row: 13, col: 29 },
-      { row: 14, col: 28 }, { row: 14, col: 29 },
+    { time: 2.8, type: 'read', cells: [
+      { row: 13, col: 26 }, { row: 13, col: 27 },
+      { row: 14, col: 26 }, { row: 14, col: 27 },
     ] },
-    { time: 7.6, type: 'read', cells: [
-      { row: 13, col: 33 }, { row: 13, col: 34 }, { row: 13, col: 35 },
-      { row: 14, col: 33 }, { row: 14, col: 34 }, { row: 14, col: 35 },
+    { time: 3.4, type: 'read', cells: [
+      { row: 13, col: 31 }, { row: 13, col: 32 },
+      { row: 14, col: 31 }, { row: 14, col: 32 },
     ] },
-    { time: 8.8, type: 'read', cells: [
-      { row: 13, col: 39 }, { row: 13, col: 40 },
-      { row: 14, col: 39 }, { row: 14, col: 40 },
+    { time: 4.0, type: 'read', cells: [
+      { row: 13, col: 35 }, { row: 13, col: 36 }, { row: 13, col: 37 },
+      { row: 14, col: 35 }, { row: 14, col: 36 }, { row: 14, col: 37 },
     ] },
-    { time: 10.0, type: 'read', cells: [
+    { time: 4.6, type: 'read', cells: [
+      { row: 13, col: 40 }, { row: 13, col: 41 },
+      { row: 14, col: 40 }, { row: 14, col: 41 },
+    ] },
+    { time: 5.2, type: 'read', cells: [
       { row: 13, col: 44 }, { row: 13, col: 45 }, { row: 13, col: 46 },
       { row: 14, col: 44 }, { row: 14, col: 45 }, { row: 14, col: 46 },
     ] },
-    { time: 11.2, type: 'read', cells: [
+    { time: 5.8, type: 'read', cells: [
       { row: 13, col: 50 }, { row: 13, col: 51 },
       { row: 14, col: 50 }, { row: 14, col: 51 },
+    ] },
+    { time: 6.4, type: 'read', cells: [
+      { row: 13, col: 53 }, { row: 13, col: 54 },
+      { row: 14, col: 53 }, { row: 14, col: 54 },
     ] },
   ],
 };

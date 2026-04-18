@@ -49,11 +49,11 @@ export default {
   // The wide pit is impassable. Bridge write events appear at t=4.5s and
   // t=5.5s, laying down 4 cells across cols 22-25 (then 26-29 a beat later).
   events: [
-    { time: 4.5, type: 'write', cells: [
+    { time: 2.0, type: 'write', cells: [
       { row: 13, col: 22 }, { row: 13, col: 23 },
       { row: 13, col: 24 }, { row: 13, col: 25 },
     ] },
-    { time: 5.5, type: 'write', cells: [
+    { time: 2.7, type: 'write', cells: [
       { row: 13, col: 26 }, { row: 13, col: 27 },
       { row: 13, col: 28 }, { row: 13, col: 29 },
     ] },

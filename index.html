@@ -30,11 +30,57 @@
           <div class="statusrow__progress"><div id="progress-bar"></div></div>
           <div class="statusrow__pct" id="status-pct">0% Complete</div>
           <div class="statusrow__btns">
-            <button class="btn"><u>S</u>top</button>
-            <button class="btn"><u>P</u>ause</button>
-            <button class="btn"><u>L</u>egend</button>
+            <button class="btn" id="btn-stop"><u>S</u>top</button>
+            <button class="btn" id="btn-pause"><u>P</u>ause</button>
+            <button class="btn" id="btn-legend"><u>L</u>egend</button>
             <button class="btn">Hide <u>D</u>etails</button>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="legend-modal" class="legend-modal" hidden>
+    <div class="legend-modal__bg"></div>
+    <div class="win legend-modal__win">
+      <div class="win__titlebar">
+        <div class="win__title">Defrag Legend</div>
+        <div class="win__btn" id="legend-close">×</div>
+      </div>
+      <div class="win__body legend-modal__body">
+        <h3>How to play</h3>
+        <p>Reach the magenta <span class="legend-swatch swatch--goal"></span> goal stripe at the right edge of each level. Avoid bad sectors, watch for green/red flashes (terrain about to change), and don't fall into pits. Five levels.</p>
+
+        <h3>Controls</h3>
+        <ul class="legend-controls">
+          <li><b>Move</b>: ← → or A D</li>
+          <li><b>Jump</b>: ↑ / W / Space (tap again mid-air for double jump)</li>
+          <li><b>Drop / duck</b>: ↓ or S</li>
+          <li><b>Pause</b>: P, or click the Pause button</li>
+          <li><b>Legend</b>: click Legend; Esc to close</li>
+        </ul>
+
+        <h3>Block legend</h3>
+        <table class="legend-blocks">
+          <tr><td><span class="legend-swatch swatch--cyan-solid"></span></td><td>Unoptimized data — defrag may move it</td></tr>
+          <tr><td><span class="legend-swatch swatch--cyan-diag"></span></td><td>Same; diagonal pattern variant</td></tr>
+          <tr><td><span class="legend-swatch swatch--cyan-dots"></span></td><td>Same; dotted pattern variant</td></tr>
+          <tr><td><span class="legend-swatch swatch--opt"></span></td><td>Optimized data — solid blue</td></tr>
+          <tr><td><span class="legend-swatch swatch--free"></span></td><td>Free space (empty cell — fall through)</td></tr>
+          <tr><td><span class="legend-swatch swatch--sys"></span></td><td>System / unmovable — never changes; safe platform</td></tr>
+          <tr><td><span class="legend-swatch swatch--bad"></span></td><td>Bad sector — touch = death</td></tr>
+          <tr><td><span class="legend-swatch swatch--checkpoint"></span></td><td>Checkpoint — saves your respawn spot</td></tr>
+          <tr><td><span class="legend-swatch swatch--fragile"></span></td><td>Fragile — cracks after one step</td></tr>
+          <tr><td><span class="legend-swatch swatch--goal"></span></td><td>Goal cluster — touch to clear the level</td></tr>
+          <tr><td><span class="legend-swatch swatch--coin"></span></td><td>Coin — collect for 10 points</td></tr>
+          <tr><td><span class="legend-swatch swatch--read"></span></td><td>Reading (green flash) — block about to disappear</td></tr>
+          <tr><td><span class="legend-swatch swatch--write"></span></td><td>Writing (red flash) — empty space about to solidify</td></tr>
+          <tr><td><span class="legend-swatch swatch--player"></span></td><td>You (the read head)</td></tr>
+        </table>
+
+        <p class="legend-foot">Each box represents one disk cluster.</p>
+
+        <div style="text-align: center; margin-top: 8px;">
+          <button class="btn" onclick="document.getElementById('legend-close').click()"><u>C</u>lose</button>
         </div>
       </div>
     </div>
