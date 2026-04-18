@@ -190,7 +190,7 @@ export function tick(game, dt, keystate, camera) {
           e.alive = false;
           player.vy = -10;
         } else {
-          die(game, 'enemy');
+          die(game, 'enemy', camera);
           return;
         }
       }
@@ -202,7 +202,7 @@ export function tick(game, dt, keystate, camera) {
   if (cellRow >= 0 && cellRow < level.height && cellCol >= 0 && cellCol < level.width) {
     const here = level.tiles[cellRow][cellCol];
     if (isLethal(here)) {
-      die(game, 'bad_sector');
+      die(game, 'bad_sector', camera);
       return;
     }
     if (isCheckpoint(here)) {
@@ -215,23 +215,23 @@ export function tick(game, dt, keystate, camera) {
   }
 
   if (player.y > level.height + 2) {
-    die(game, 'fell');
+    die(game, 'fell', camera);
     return;
   }
 
   if (defrag.front >= player.x) {
-    die(game, 'defrag');
+    die(game, 'defrag', camera);
     return;
   }
 }
 
-function die(game, reason) {
+function die(game, reason, camera) {
   if (game.state !== 'playing') return;
   game.lives -= 1;
   play('death');
   game.deathReason = reason;
   game.state = 'dying';
-  startDeathAnimation(game);
+  startDeathAnimation(game, camera);
 }
 
 function win(game, camera) {

@@ -33,14 +33,18 @@ function textCells(text, level, originRow, originCol) {
   return cells;
 }
 
-export function startDeathAnimation(game) {
+export function startDeathAnimation(game, camera) {
   pauseDefrag(game.defrag);
   clearDefragOps(game.defrag);
 
   const textWidth = TEXT.length * GLYPH_W + (TEXT.length - 1) * GLYPH_GAP;
   const textRow0  = Math.floor((game.level.height - GLYPH_H) / 2);
-  const textCol0  = Math.floor((game.level.width  - textWidth) / 2);
-  const target    = textCells(TEXT, game.level, textRow0, textCol0);
+  // Center text in the VIEWPORT (camera.x + viewportCols/2), clamped to the level.
+  const camX  = camera ? camera.x : 0;
+  const camW  = camera ? camera.viewportCols : game.level.width;
+  let textCol0 = camX + Math.floor((camW - textWidth) / 2);
+  textCol0 = Math.max(0, Math.min(game.level.width - textWidth, textCol0));
+  const target = textCells(TEXT, game.level, textRow0, textCol0);
 
   const writes = [];
   const reads  = [];
