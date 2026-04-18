@@ -43,17 +43,7 @@ export function paintGrid(renderer, level, camera, defrag, enemies = [], player 
     }
   }
 
-  // 2b. Defrag front (red-bordered dark column at the leading edge)
-  if (defrag && defrag.front >= 0) {
-    const frontCol = Math.floor(defrag.front);
-    const localFront = frontCol - xOffset;
-    if (localFront >= 0 && localFront < viewportCols) {
-      for (let r = 0; r < viewportRows; r++) {
-        cells[r * viewportCols + localFront].className = 'cell cell--front';
-      }
-    }
-  }
-  // 2c. Defrag op tells (read/write flashes; on top of front/consumed)
+  // 2b. Defrag op tells (read/write flashes)
   if (defrag) {
     for (let r = 0; r < viewportRows; r++) {
       for (let c = 0; c < viewportCols; c++) {

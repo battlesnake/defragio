@@ -80,12 +80,11 @@
   50% { background: #88ff88; box-shadow: 0 0 6px 2px #88ff88; }
 }
 
-/* Defrag completion frontier — vertical column showing where the operation
-   has reached. Anything to its left is dead zone (instant death). */
-.cell--front {
-  background: #404040;
-  border-color: #d80000;
-  box-shadow: inset 1px 0 0 #ff0000, inset -1px 0 0 #ff0000;
+/* Coin: small rectangular gold cell. Player walks through to collect. */
+.cell--coin {
+  background: linear-gradient(135deg, #fff4a3 0%, #d4af37 55%, #8b6914 100%);
+  border-color: #6b4c00;
+  box-shadow: inset -1px -1px 0 #806000, inset 1px 1px 0 #ffeb78;
 }
 
 /* Goal */

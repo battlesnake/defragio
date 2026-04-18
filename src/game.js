@@ -7,10 +7,11 @@ import {
   startGameOverAnimation, startQuickDeathAnimation,
   startFlushAnimation, tickFlush, isFlushDone,
   startDefragInAnimation,
+  startFinalWinAnimation,
 } from './world/animations/index.js';
-import { createJumpBuffer, recordJumpPress, recordLeftGround, tickBuffer, canJump, clearJump } from './input/buffer.js';
+import { createJumpBuffer, recordJumpPress, recordLeftGround, tickBuffer, canJump, clearJump, inCoyote } from './input/buffer.js';
 import { consumeEdges } from './input/keystate.js';
-import { isLethal, isCheckpoint, isGoal } from './world/tile.js';
+import { isLethal, isCheckpoint, isGoal, isCoin, TILE } from './world/tile.js';
 import { createCheckpointTracker, recordCheckpoint, lastCheckpoint } from './world/checkpoint.js';
 import { spawnEnemies, tickEnemies } from './enemies/registry.js';
 import { play } from './audio/sounds.js';
@@ -63,6 +64,7 @@ export function createGameState(initialLevelIdx = 0) {
     levels,
     levelIdx: initialLevelIdx,
     lives: 3,
+    score: 0,
     state: 'waiting',
     deathReason: null,
     animationDoneAt: 0,
@@ -133,22 +135,34 @@ export function tick(game, dt, keystate, camera) {
     game.t += dt;
     tickFlush(game.flush, dt);
     if (isFlushDone(game)) {
-      // Empty the level entirely (any solid cells the flush did not consume
-      // should be wiped before defrag-in writes the next level back in).
       const lvl = game.level;
       for (let r = 0; r < lvl.height; r++) {
         for (let c = 0; c < lvl.width; c++) lvl.tiles[r][c] = 0;
       }
-      // Advance to the next level. tilesSnapshot for defrag-in must be the
-      // NEW level's data, but the level grid itself stays empty for now.
+      // If the player just beat the final level, show the YOU WIN finale
+      // instead of looping back to level 1.
+      if (game.levelIdx === game.levels.length - 1) {
+        game.state = 'final-winning';
+        startFinalWinAnimation(game, camera);
+        return;
+      }
       const nextIdx = (game.levelIdx + 1) % game.levels.length;
       const nextRaw = game.levels[nextIdx];
       const nextLoaded = loadLevel(nextRaw);
       game.tilesSnapshot = snapshotTiles(nextLoaded);
-      // Stash the next-level metadata (we'll switch to it after defrag-in)
       game._pendingNextIdx = nextIdx;
       game.state = 'defragging-in';
       startDefragInAnimation(game);
+    }
+    return;
+  }
+
+  // Finale: disk fully defrags to blue, then carves YOU WIN
+  if (game.state === 'final-winning') {
+    game.t += dt;
+    advanceDefrag(game.defrag, dt);
+    if (game.t >= game.animationDoneAt) {
+      game.state = 'won-game';
     }
     return;
   }
@@ -187,7 +201,10 @@ export function tick(game, dt, keystate, camera) {
   applyHorizontalIntent(player, intent, dt);
 
   const wasOnGround = player.onGround;
-  if (canJump(jumpBuffer, game.t, player.onGround)) {
+  if (canJump(jumpBuffer, game.t, player.onGround, player.airJumpsUsed)) {
+    if (!player.onGround && !inCoyote(jumpBuffer, game.t)) {
+      player.airJumpsUsed += 1;
+    }
     startJump(player);
     clearJump(jumpBuffer);
   }
@@ -197,6 +214,7 @@ export function tick(game, dt, keystate, camera) {
   resolveCollisions(player, level);
 
   if (wasOnGround && !player.onGround) recordLeftGround(jumpBuffer, game.t);
+  if (!wasOnGround && player.onGround) player.airJumpsUsed = 0;
 
   if (game.t > CONFIG.CURSOR_START_DELAY_SEC) {
     advanceDefrag(defrag, dt);
@@ -230,6 +248,10 @@ export function tick(game, dt, keystate, camera) {
     if (isCheckpoint(here)) {
       recordCheckpoint(game.checkpoints, { row: cellRow, col: cellCol });
     }
+    if (isCoin(here)) {
+      game.score += 10;
+      level.tiles[cellRow][cellCol] = TILE.FREE;
+    }
     if (isGoal(here)) {
       win(game, camera);
       return;
@@ -238,11 +260,6 @@ export function tick(game, dt, keystate, camera) {
 
   if (player.y > level.height + 2) {
     die(game, 'fell', camera);
-    return;
-  }
-
-  if (defrag.front >= player.x) {
-    die(game, 'defrag', camera);
     return;
   }
 }

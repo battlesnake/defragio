@@ -31,9 +31,27 @@ export const FONT = {
   'A': [
     '.XXX.', 'X...X', 'X...X', 'XXXXX', 'X...X', 'X...X', 'X...X',
   ],
-  // Cyrillic Л — rectangular arch with two legs.
+  // Cyrillic Л — narrower top + slanted legs to distinguish from П.
   'Л': [
-    'XXXXX', 'X...X', 'X...X', 'X...X', 'X...X', 'X...X', 'X...X',
+    '.XXX.', '.X.X.', '.X.X.', '.X.X.', '.X.X.', 'X...X', 'X...X',
+  ],
+  'W': [
+    'X...X', 'X...X', 'X...X', 'X.X.X', 'X.X.X', 'XX.XX', 'X...X',
+  ],
+  'I': [
+    'XXXXX', '..X..', '..X..', '..X..', '..X..', '..X..', 'XXXXX',
+  ],
+  'N': [
+    'X...X', 'XX..X', 'X.X.X', 'X.X.X', 'X.X.X', 'X..XX', 'X...X',
+  ],
+  'B': [
+    'XXXX.', 'X...X', 'X...X', 'XXXX.', 'X...X', 'X...X', 'XXXX.',
+  ],
+  'V': [
+    'X...X', 'X...X', 'X...X', 'X...X', 'X...X', '.X.X.', '..X..',
+  ],
+  'D': [
+    'XXXX.', 'X...X', 'X...X', 'X...X', 'X...X', 'X...X', 'XXXX.',
   ],
 };
 // Cyrillic О / А / М render with the same glyph as their Latin lookalikes.

@@ -9,6 +9,7 @@ export const TILE = Object.freeze({
   CHECKPOINT: 7,
   FRAGILE: 8,
   GOAL: 9,
+  COIN: 10,
 });
 
 const SOLID = new Set([
@@ -38,6 +39,7 @@ const CHAR_TO_TILE = {
   'C': TILE.CHECKPOINT,
   'F': TILE.FRAGILE,
   'G': TILE.GOAL,
+  '$': TILE.COIN,
 };
 
 export const fromChar = (ch) => {
@@ -57,9 +59,11 @@ const TILE_TO_CLASS = {
   [TILE.CHECKPOINT]: 'cell--checkpoint',
   [TILE.FRAGILE]: 'cell--fragile',
   [TILE.GOAL]: 'cell--goal',
+  [TILE.COIN]: 'cell--coin',
 };
 
 export const cellClassFor = (t) => TILE_TO_CLASS[t] || 'cell--free';
 
 export const isCheckpoint = (t) => t === TILE.CHECKPOINT;
 export const isGoal       = (t) => t === TILE.GOAL;
+export const isCoin       = (t) => t === TILE.COIN;

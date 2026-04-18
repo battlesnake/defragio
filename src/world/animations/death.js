@@ -7,7 +7,7 @@ import { isSolid } from '../tile.js';
 import { pauseDefrag, clearDefragOps, scheduleScriptedOp } from '../defrag.js';
 import { FONT, GLYPH_W, GLYPH_H, GLYPH_GAP } from './font.js';
 
-const QUICK_TEXTS = ['LOL', 'LMAO', 'ЛОЛ', 'ЛМАО'];
+const QUICK_TEXTS = ['LOL', 'LMAO', 'ЛОЛ', 'ЛМАО', 'DVBYB'];
 
 const FULL_TIMING = {
   tellDur: 0.30,

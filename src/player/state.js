@@ -11,5 +11,6 @@ export function createPlayer(start) {
     width: 1,
     height: 1,
     invulnTime: 0,
+    airJumpsUsed: 0,
   };
 }

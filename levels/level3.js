@@ -11,22 +11,19 @@ export default {
   height: 16,
   grid: [
     empty(), empty(), empty(), empty(),
-    row([[57, '.'], [3, 'G']]),                     // 4
-    row([[57, '.'], [3, 'G']]),                     // 5
-    row([[57, '.'], [3, 'G']]),                     // 6
-    row([[57, '.'], [3, 'G']]),                     // 7
-    row([[57, '.'], [3, 'Y']]),                     // 8
-    row([[57, '.'], [3, 'Y']]),                     // 9
-    row([[57, '.'], [3, 'Y']]),                     // 10
-    row([[10, '.'], [3, 'Y'], [44, '.'], [3, 'Y']]),  // 11 - safe yellow before pit
-    row([[2, '.'], [1, 'P'], [16, '.'], [1, 'C'], [37, '.'], [3, 'Y']]),  // 12
+    empty(), empty(), empty(), empty(),              // 4-7
+    empty(),                                         // 8
+    row([[24, '.'], [1, '$'], [4, '.'], [1, '$'], [27, '.'], [3, '.']]),  // 9 - coins above bridge
+    empty(),                                         // 10
+    row([[10, '.'], [3, 'Y'], [44, '.'], [3, 'G']]),  // 11 - goal stripe top
+    row([[2, '.'], [1, 'P'], [16, '.'], [1, 'C'], [37, '.'], [3, 'G']]),  // 12 - goal stripe mid
     row([                                           // 13
       [16, '~'], [1, 'B'], [3, '~'],                // 0-19, bad at 16
       [10, '.'],                                    // wide pit cols 20-29
       [4, '~'], [1, 'B'], [4, '~'],                 // 30-38
       [3, '.'],                                     // pit cols 39-41
       [15, '~'],                                    // 42-56
-      [3, 'Y'],                                     // 57-59
+      [3, 'G'],                                     // goal 57-59
     ]),
     row([                                           // 14
       [20, '~'],
@@ -59,11 +56,6 @@ export default {
     { time: 5.5, type: 'write', cells: [
       { row: 13, col: 26 }, { row: 13, col: 27 },
       { row: 13, col: 28 }, { row: 13, col: 29 },
-    ] },
-    // Stepping stones at row 12 just before the goal tower, so the player
-    // has a launch pad from which to jump-and-right onto the goal cells.
-    { time: 8.5, type: 'write', cells: [
-      { row: 12, col: 52 }, { row: 12, col: 53 }, { row: 12, col: 54 },
     ] },
   ],
 };

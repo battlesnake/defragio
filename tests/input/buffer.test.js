@@ -11,8 +11,9 @@ test('canJump returns true when on ground and jump pressed this frame', () => {
 test('jump buffer remembers a press for ~80ms before landing', () => {
   const buf = createJumpBuffer();
   recordJumpPress(buf, 1.0);
-  assert.equal(canJump(buf, 1.0, false), false);
-  assert.equal(canJump(buf, 1.06, true), true);
+  // No ground, no coyote, no air jumps left → cannot jump
+  assert.equal(canJump(buf, 1.0, false, 1), false);
+  assert.equal(canJump(buf, 1.06, true, 1), true);
 });
 
 test('jump buffer expires after window', () => {
@@ -32,7 +33,14 @@ test('coyote time expires', () => {
   const buf = createJumpBuffer();
   recordLeftGround(buf, 1.0);
   recordJumpPress(buf, 1.2);
-  assert.equal(canJump(buf, 1.2, false), false);
+  // No ground, coyote expired, no air jumps left → cannot jump
+  assert.equal(canJump(buf, 1.2, false, 1), false);
+});
+
+test('air jump available when off ground and no air jumps used', () => {
+  const buf = createJumpBuffer();
+  recordJumpPress(buf, 1.0);
+  assert.equal(canJump(buf, 1.0, false, 0), true);
 });
 
 test('tickBuffer prunes stale entries', () => {

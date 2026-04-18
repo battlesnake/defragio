@@ -1,5 +1,6 @@
 const JUMP_BUFFER_SEC  = 0.08;
 const COYOTE_TIME_SEC  = 0.08;
+const MAX_AIR_JUMPS    = 1;   // double jump: one extra jump while airborne
 
 export function createJumpBuffer() {
   return {
@@ -25,12 +26,16 @@ export function tickBuffer(buf, t) {
   }
 }
 
-export function canJump(buf, t, onGround) {
+export function canJump(buf, t, onGround, airJumpsUsed = 0) {
   const recentPress = buf.lastJumpPressedAt !== null && (t - buf.lastJumpPressedAt) <= JUMP_BUFFER_SEC;
   if (!recentPress) return false;
   if (onGround) return true;
-  const inCoyote = buf.lastLeftGroundAt !== null && (t - buf.lastLeftGroundAt) <= COYOTE_TIME_SEC;
-  return inCoyote;
+  if (inCoyote(buf, t)) return true;
+  return airJumpsUsed < MAX_AIR_JUMPS;
+}
+
+export function inCoyote(buf, t) {
+  return buf.lastLeftGroundAt !== null && (t - buf.lastLeftGroundAt) <= COYOTE_TIME_SEC;
 }
 
 export function clearJump(buf) {

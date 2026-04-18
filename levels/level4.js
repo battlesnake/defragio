@@ -10,20 +10,17 @@ export default {
   height: 16,
   grid: [
     empty(), empty(), empty(), empty(),
-    row([[57, '.'], [3, 'G']]),                     // 4
-    row([[57, '.'], [3, 'G']]),                     // 5
-    row([[57, '.'], [3, 'G']]),                     // 6
-    row([[57, '.'], [3, 'G']]),                     // 7
-    row([[57, '.'], [3, 'Y']]),                     // 8
-    row([[8, '.'], [3, 'Y'], [25, '.'], [3, 'Y'], [18, '.'], [3, 'Y']]),  // 9 — high stable platforms (escape route)
-    row([[57, '.'], [3, 'Y']]),                     // 10
-    row([[57, '.'], [3, 'Y']]),                     // 11
-    row([[2, '.'], [1, 'P'], [50, '.'], [3, 'Y'], [1, '.'], [3, 'Y']]),  // 12 — stepping stones at 53-55
+    empty(), empty(), empty(), empty(),              // 4-7
+    empty(),                                         // 8
+    row([[8, '.'], [3, 'Y'], [25, '.'], [3, 'Y'], [18, '.'], [3, '.']]),  // 9 — high stable platforms (escape route)
+    row([[12, '.'], [1, '$'], [27, '.'], [1, '$'], [16, '.'], [3, '.']]), // 10 - coins above the high platforms
+    row([[57, '.'], [3, 'G']]),                     // 11 - goal stripe top
+    row([[2, '.'], [1, 'P'], [54, '.'], [3, 'G']]),  // 12 - goal stripe mid
     row([                                           // 13 — uniform floor; events carve it
-      [56, '~'], [1, 'B'], [3, 'Y'],
+      [56, '~'], [1, 'B'], [3, 'G'],
     ]),
-    row([                                           // 14
-      [56, '~'], [1, '~'], [3, 'Y'],
+    row([                                           // 14 floor base
+      [60, '~'],
     ]),
     row([                                           // 15
       [60, '~'],
