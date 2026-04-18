@@ -296,10 +296,12 @@ export function tick(game, dt, keystate, camera) {
   const cellRow = Math.floor(player.y);
   const cellCol = Math.floor(player.x);
 
-  // Lethality check: any AABB cell or feet cell that's lethal kills.
+  // Lethality check: only the player's center column kills, so the
+  // sprite has to be visually IN the bad sector's column (not just an
+  // AABB-pixel overlapping it from one cell over).
   const lethalChecks = [
-    [yT, xL], [yT, xR], [yB, xL], [yB, xR],
-    [feetRow, xL], [feetRow, xR],
+    [cellRow, cellCol],
+    [feetRow, cellCol],
   ];
   for (const [r, c] of lethalChecks) {
     if (r < 0 || r >= level.height || c < 0 || c >= level.width) continue;
