@@ -4,7 +4,7 @@ import { startJump, releaseJump } from './player/jump.js';
 import { resolveCollisions } from './world/collision.js';
 import { createDefrag, advanceDefrag, scheduleScriptedOp } from './world/defrag.js';
 import {
-  startDeathAnimation,
+  startGameOverAnimation, startQuickDeathAnimation,
   startFlushAnimation, tickFlush, isFlushDone,
   startDefragInAnimation,
 } from './world/animations/index.js';
@@ -115,7 +115,7 @@ export function tick(game, dt, keystate, camera) {
     integrate(game.player, dt);
     if (game.player.y > game.level.height + 5) {
       game.state = 'dying';
-      startDeathAnimation(game, game.deathCamera);
+      startDeathTextAnimation(game, game.deathCamera);
     }
     return;
   }
@@ -265,7 +265,12 @@ function die(game, reason, camera) {
     return;
   }
   game.state = 'dying';
-  startDeathAnimation(game, camera);
+  startDeathTextAnimation(game, camera);
+}
+
+function startDeathTextAnimation(game, camera) {
+  if (game.lives <= 0) startGameOverAnimation(game, camera);
+  else startQuickDeathAnimation(game, camera);
 }
 
 function win(game, camera) {

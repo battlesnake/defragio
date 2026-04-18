@@ -1,16 +1,29 @@
-// "YOU LOSE" defrag-style morph: read existing terrain away, write the
-// text in. Driven by the existing defrag scripted-op mechanism.
+// Death-text morph animations on the cell grid.
+//
+//   startGameOverAnimation: full "YOU LOSE" — only when lives run out.
+//   startQuickDeathAnimation: a brief LOL/LMAO/ЛОЛ/ЛМАО between lives.
 
 import { isSolid } from '../tile.js';
 import { pauseDefrag, clearDefragOps, scheduleScriptedOp } from '../defrag.js';
 import { FONT, GLYPH_W, GLYPH_H, GLYPH_GAP } from './font.js';
 
-const TEXT = 'YOU LOSE';
-const TELL_DUR = 0.30;
-const READ_STAGGER = 0.010;
-const WRITE_STAGGER = 0.014;
-const GAP_BEFORE_WRITES = 0.15;
-const ADMIRE_AFTER = 1.0;
+const QUICK_TEXTS = ['LOL', 'LMAO', 'ЛОЛ', 'ЛМАО'];
+
+const FULL_TIMING = {
+  tellDur: 0.30,
+  readStagger: 0.010,
+  writeStagger: 0.014,
+  gapBeforeWrites: 0.15,
+  admire: 1.0,
+};
+
+const QUICK_TIMING = {
+  tellDur: 0.10,
+  readStagger: 0.0035,
+  writeStagger: 0.005,
+  gapBeforeWrites: 0.05,
+  admire: 0.35,
+};
 
 function textCells(text, level, originRow, originCol) {
   const cells = new Set();
@@ -33,24 +46,24 @@ function textCells(text, level, originRow, originCol) {
   return cells;
 }
 
-export function startDeathAnimation(game, camera) {
+function runTextMorph(game, camera, text, t) {
   pauseDefrag(game.defrag);
   clearDefragOps(game.defrag);
 
-  const textWidth = TEXT.length * GLYPH_W + (TEXT.length - 1) * GLYPH_GAP;
+  const charCount = [...text].length;
+  const textWidth = charCount * GLYPH_W + (charCount - 1) * GLYPH_GAP;
   const textRow0  = Math.floor((game.level.height - GLYPH_H) / 2);
-  // Center text in the VIEWPORT (camera.x + viewportCols/2), clamped to the level.
   const camX  = camera ? camera.x : 0;
   const camW  = camera ? camera.viewportCols : game.level.width;
   let textCol0 = camX + Math.floor((camW - textWidth) / 2);
   textCol0 = Math.max(0, Math.min(game.level.width - textWidth, textCol0));
-  const target = textCells(TEXT, game.level, textRow0, textCol0);
+  const target = textCells(text, game.level, textRow0, textCol0);
 
   const writes = [];
   const reads  = [];
   for (let r = 0; r < game.level.height; r++) {
     for (let c = 0; c < game.level.width; c++) {
-      const wantSolid = target.has(r * 10000 + c);
+      const wantSolid  = target.has(r * 10000 + c);
       const isCurSolid = isSolid(game.level.tiles[r][c]);
       if (wantSolid && !isCurSolid) writes.push({ row: r, col: c });
       if (!wantSolid && isCurSolid) reads.push({ row: r, col: c });
@@ -60,16 +73,25 @@ export function startDeathAnimation(game, camera) {
   reads.sort((a, b) => a.col - b.col || a.row - b.row);
   writes.sort((a, b) => a.col - b.col || a.row - b.row);
 
-  let t = 0;
+  let when = 0;
   for (const cell of reads) {
-    scheduleScriptedOp(game.defrag, 'read', [cell], t, TELL_DUR);
-    t += READ_STAGGER;
+    scheduleScriptedOp(game.defrag, 'read', [cell], when, t.tellDur);
+    when += t.readStagger;
   }
-  t += GAP_BEFORE_WRITES;
+  when += t.gapBeforeWrites;
   for (const cell of writes) {
-    scheduleScriptedOp(game.defrag, 'write', [cell], t, TELL_DUR);
-    t += WRITE_STAGGER;
+    scheduleScriptedOp(game.defrag, 'write', [cell], when, t.tellDur);
+    when += t.writeStagger;
   }
 
-  game.animationDoneAt = game.t + t + TELL_DUR + ADMIRE_AFTER;
+  game.animationDoneAt = game.t + when + t.tellDur + t.admire;
+}
+
+export function startGameOverAnimation(game, camera) {
+  runTextMorph(game, camera, 'YOU LOSE', FULL_TIMING);
+}
+
+export function startQuickDeathAnimation(game, camera) {
+  const text = QUICK_TEXTS[Math.floor(Math.random() * QUICK_TEXTS.length)];
+  runTextMorph(game, camera, text, QUICK_TIMING);
 }
