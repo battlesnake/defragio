@@ -18,11 +18,11 @@ export function updateChrome(game) {
   const playerCol = Math.floor(game.player.x);
   const cluster = playerCol.toString(16).padStart(4, '0').toUpperCase();
   const lives = game.lives.toString().padStart(2, '0');
-  const score = game.score.toString().padStart(5, '0');
+  const coins = game.coins.toString().padStart(2, '0');
   if (game.state === 'waiting') {
-    els.status.textContent = `Ready · ${lives} lives · score ${score} · press ← → ↑ ↓ / WASD / Space to begin`;
+    els.status.textContent = `Ready · ${lives} lives · ${coins} coins · press ← → ↑ ↓ / WASD / Space to begin`;
   } else {
-    els.status.textContent = `Defragmenting... · cluster 0x${cluster} · ${lives} lives · score ${score}`;
+    els.status.textContent = `Defragmenting... · cluster 0x${cluster} · ${lives} lives · ${coins} coins`;
   }
   const pct = Math.max(0, Math.min(100, Math.floor((game.player.x / game.level.width) * 100)));
   els.pct.textContent = `${pct}% Complete`;

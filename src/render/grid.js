@@ -24,14 +24,14 @@ export function createGridRenderer({ container, viewportCols, viewportRows, cell
   return { cells, viewportCols, viewportRows, cellWidth, cellHeight, grid };
 }
 
-// Paint order: tiles → defrag op tells → flush particles → enemies → player.
+// Paint order: tiles → defrag op tells → flush particles → enemies → player → HUD.
 // Each particle maps to its containing cell (floor(x), floor(y)); when two
 // particles occupy the same cell, the one written later wins.
-export function paintGrid(renderer, level, camera, defrag, enemies = [], player = null, particles = null) {
+export function paintGrid(renderer, level, camera, defrag, enemies = [], player = null, particles = null, coins = 0) {
   const { cells, viewportCols, viewportRows } = renderer;
   const xOffset = camera.x;
 
-  // 1. Base tiles
+  // 1. Base tiles (clear text content too — cells are pooled)
   for (let r = 0; r < viewportRows; r++) {
     for (let c = 0; c < viewportCols; c++) {
       const worldCol = xOffset + c;
@@ -39,7 +39,9 @@ export function paintGrid(renderer, level, camera, defrag, enemies = [], player 
       if (r >= 0 && r < level.height && worldCol >= 0 && worldCol < level.width) {
         tileClass = cellClassFor(level.tiles[r][worldCol]);
       }
-      cells[r * viewportCols + c].className = `cell ${tileClass}`;
+      const cell = cells[r * viewportCols + c];
+      cell.className = `cell ${tileClass}`;
+      if (cell.textContent !== '') cell.textContent = '';
     }
   }
 
@@ -84,6 +86,10 @@ export function paintGrid(renderer, level, camera, defrag, enemies = [], player 
 
   // 5. Player on top — flicker (skip render every other tick) while invulnerable
   if (player) {
+    // (drawn after coin HUD below to stay on top of normal cells; HUD lives in
+    // its own row/column slice and doesn't conflict with player position.)
+  }
+  if (player) {
     const flicker = player.invulnTime > 0 && Math.floor(player.invulnTime * 12) % 2 === 0;
     if (!flicker) {
       const worldCol = Math.floor(player.x);
@@ -93,5 +99,20 @@ export function paintGrid(renderer, level, camera, defrag, enemies = [], player 
         cells[worldRow * viewportCols + localCol].className = 'cell cell--player';
       }
     }
+  }
+
+  // 6. Coin HUD in top-right: [coin] [x] [tens] [ones]
+  const hudStart = (viewportCols - 4);
+  if (hudStart >= 0) {
+    const tens = Math.floor((coins % 100) / 10);
+    const ones = coins % 10;
+    const c0 = cells[0 * viewportCols + hudStart];
+    const c1 = cells[0 * viewportCols + hudStart + 1];
+    const c2 = cells[0 * viewportCols + hudStart + 2];
+    const c3 = cells[0 * viewportCols + hudStart + 3];
+    c0.className = 'cell cell--coin';
+    c1.className = 'cell cell--digit'; c1.textContent = 'x';
+    c2.className = 'cell cell--digit'; c2.textContent = String(tens);
+    c3.className = 'cell cell--digit'; c3.textContent = String(ones);
   }
 }

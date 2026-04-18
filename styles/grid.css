@@ -86,6 +86,17 @@
   border-color: #6b4c00;
   box-shadow: inset -1px -1px 0 #806000, inset 1px 1px 0 #ffeb78;
 }
+/* Coin-count overlay digit cell (top-right HUD) */
+.cell--digit {
+  background: #000;
+  border-color: #000;
+  color: #ffeb78;
+  font-family: 'MS Sans Serif', monospace;
+  font-size: 9px;
+  font-weight: bold;
+  text-align: center;
+  line-height: 14px;
+}
 
 /* Goal */
 .cell--goal {

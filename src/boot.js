@@ -61,6 +61,7 @@ function frame(now) {
     showActors ? game.enemies : [],
     showActors ? game.player  : null,
     particles,
+    game.coins,
   );
   updateChrome(game);
   syncPauseButton(game);

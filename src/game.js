@@ -64,8 +64,8 @@ export function createGameState(initialLevelIdx = 0) {
     ...base,
     levels,
     levelIdx: initialLevelIdx,
-    lives: 3,
-    score: 0,
+    lives: 5,
+    coins: 0,
     state: 'waiting',
     deathReason: null,
     animationDoneAt: 0,
@@ -312,7 +312,7 @@ export function tick(game, dt, keystate, camera) {
       recordCheckpoint(game.checkpoints, { row: cellRow, col: cellCol });
     }
     if (isCoin(here)) {
-      game.score += 10;
+      game.coins += 1;
       level.tiles[cellRow][cellCol] = TILE.FREE;
     }
     if (isGoal(here)) {
@@ -364,8 +364,8 @@ function die(game, reason, camera) {
   // enemy / bad sector / crush costs ALL their coins + grants ~1.5s of
   // flicker invulnerability instead of taking a life.
   const isHit = reason === 'enemy' || reason === 'bad_sector' || reason === 'crushed';
-  if (isHit && game.score > 0) {
-    game.score = 0;
+  if (isHit && game.coins > 0) {
+    game.coins = 0;
     game.player.invulnTime = 1.5;
     play('death');
     return;
