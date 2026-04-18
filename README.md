@@ -2,6 +2,8 @@
 
 Browser platformer themed as the Win98 Disk Defragmenter.
 
+Repo: <https://github.com/battlesnake/defragio>
+
 ## Develop
 
 Serve over HTTP so ES module imports work:
