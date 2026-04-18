@@ -16,23 +16,23 @@ export function bindButtons(game) {
   modalClose = document.getElementById('legend-close');
 
   if (pauseBtn) {
-    pauseBtn.addEventListener('click', () => togglePause(game));
+    pauseBtn.addEventListener('click', (e) => { togglePause(game); e.currentTarget.blur(); });
   }
   if (legendBtn) {
-    legendBtn.addEventListener('click', () => openLegend(game));
+    legendBtn.addEventListener('click', (e) => { openLegend(game); e.currentTarget.blur(); });
   }
   if (modalClose) {
-    modalClose.addEventListener('click', () => closeLegend(game));
+    modalClose.addEventListener('click', (e) => { closeLegend(game); e.currentTarget.blur && e.currentTarget.blur(); });
   }
   // Esc closes the legend
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && modal && !modal.hidden) closeLegend(game);
   });
-  // P toggles pause (also via the keyboard)
+  // P toggles pause — but only mid-game (not during 'waiting' so the
+  // first input always starts the game; not during animation states).
   window.addEventListener('keydown', (e) => {
     if (e.key === 'p' || e.key === 'P') {
-      // Don't pause in the middle of typing a cheat code that starts with p (none yet)
-      togglePause(game);
+      if (game.state === 'playing' || game.state === 'paused') togglePause(game);
     }
   });
 }
