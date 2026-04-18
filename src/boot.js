@@ -5,6 +5,7 @@ import { createGridRenderer, paintGrid } from './render/grid.js';
 import { bindChrome, updateChrome } from './render/chrome.js';
 import { loadSounds } from './audio/sounds.js';
 import { createKeyState, attachKeyState } from './input/keystate.js';
+import { attachCheatListener } from './input/cheat.js';
 
 const game = createGameState();
 
@@ -20,6 +21,7 @@ const camera = createCamera();
 
 const keystate = createKeyState();
 attachKeyState(keystate);
+attachCheatListener(game);
 bindChrome();
 loadSounds({
   death:         'assets/audio/death.wav',

@@ -81,16 +81,11 @@
 }
 
 /* Defrag completion frontier — vertical column showing where the operation
-   has reached. Anything to its left is dead zone (instant death).
-   Tinted dark gray so it reads as "consumed" terrain. */
+   has reached. Anything to its left is dead zone (instant death). */
 .cell--front {
   background: #404040;
   border-color: #d80000;
   box-shadow: inset 1px 0 0 #ff0000, inset -1px 0 0 #ff0000;
-}
-.cell--consumed {
-  background: rgba(0, 0, 0, 0.45);
-  border-color: #303030;
 }
 
 /* Goal */
