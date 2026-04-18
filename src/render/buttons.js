@@ -76,6 +76,11 @@ function closeModal(game, name) {
   }
 }
 
+// Programmatically open the controls modal — used to greet the player on page load.
+export function openControls(game) {
+  openModal(game, 'controls');
+}
+
 export function syncPauseButton(game) {
   if (!pauseBtn) return;
   pauseBtn.innerHTML = game.state === 'paused' ? '<u>R</u>esume' : '<u>P</u>ause';

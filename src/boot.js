@@ -6,7 +6,7 @@ import { bindChrome, updateChrome } from './render/chrome.js';
 import { loadSounds } from './audio/sounds.js';
 import { createKeyState, attachKeyState } from './input/keystate.js';
 import { attachCheatListener } from './input/cheat.js';
-import { bindButtons, syncPauseButton } from './render/buttons.js';
+import { bindButtons, syncPauseButton, openControls } from './render/buttons.js';
 
 const game = createGameState();
 
@@ -25,6 +25,7 @@ attachKeyState(keystate);
 attachCheatListener(game, camera);
 bindChrome();
 bindButtons(game);
+openControls(game);
 loadSounds({
   death:         'assets/audio/death.wav',
   levelComplete: 'assets/audio/level-complete.wav',
