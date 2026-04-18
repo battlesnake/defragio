@@ -5,6 +5,9 @@
   "type": "module",
   "scripts": {
     "test": "node --test tests/",
-    "dev": "python3 -m http.server 8080"
+    "dev": "python3 -m http.server 8080",
+    "deploy:setup": "./deploy.sh --setup",
+    "deploy": "./deploy.sh",
+    "deploy:status": "./deploy.sh --status"
   }
 }
