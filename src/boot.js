@@ -49,7 +49,16 @@ function frame(now) {
   }
   prevState = game.state;
   updateCamera(camera, game.player);
-  paintGrid(renderer, level, camera, game.defrag, game.enemies, game.player);
+  // Hide player + enemies during death/win animations so the effect is unobstructed
+  const showActors = game.state === 'playing';
+  paintGrid(
+    renderer,
+    level,
+    camera,
+    game.defrag,
+    showActors ? game.enemies : [],
+    showActors ? game.player  : null,
+  );
   updateChrome(game);
   requestAnimationFrame(frame);
 }

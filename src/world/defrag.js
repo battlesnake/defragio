@@ -38,14 +38,36 @@ export function createDefrag({ levelId, level, speed, initialOffset = 0 }) {
     ops: [],
     nextOpAt: 0.05,
     rng: makeRng(seed),
+    paused: false,
   };
 }
 
+// Stop random scheduling and front advancement (for animations).
+export function pauseDefrag(defrag) {
+  defrag.paused = true;
+}
+
+// Drop all pending random ops (call before injecting scripted ops).
+export function clearDefragOps(defrag) {
+  defrag.ops = [];
+}
+
+// Inject an op with a fixed start time (relative to "now").
+export function scheduleScriptedOp(defrag, type, cells, delay, duration) {
+  defrag.ops.push({
+    type,
+    cells,
+    scheduledAt: defrag.t + delay,
+    completeAt: defrag.t + delay + duration,
+    applied: false,
+  });
+}
+
 export function advanceDefrag(defrag, dt) {
-  defrag.front += defrag.speed * dt;
+  if (!defrag.paused) defrag.front += defrag.speed * dt;
   defrag.t += dt;
 
-  // Apply completed ops (mutate the level)
+  // Apply ops whose tell phase is over (mutate the level)
   for (const op of defrag.ops) {
     if (!op.applied && defrag.t >= op.completeAt) {
       for (const { row, col } of op.cells) {
@@ -56,6 +78,8 @@ export function advanceDefrag(defrag, dt) {
   }
   // Drop ops shortly after completion
   defrag.ops = defrag.ops.filter(op => !op.applied || defrag.t < op.completeAt + 0.15);
+
+  if (defrag.paused) return;
 
   // Schedule new ops while we're due
   while (defrag.t >= defrag.nextOpAt) {
@@ -106,9 +130,11 @@ function scheduleOp(defrag) {
 const clamp = (v, lo, hi) => v < lo ? lo : v > hi ? hi : v;
 
 // Returns 'read' | 'write' | null for a cell currently being processed.
+// Only counts ops whose tell phase has started (scheduledAt has passed).
 export function defragOpAt(defrag, row, col) {
   for (const op of defrag.ops) {
     if (op.applied) continue;
+    if (defrag.t < op.scheduledAt) continue;
     for (const c of op.cells) {
       if (c.row === row && c.col === col) return op.type;
     }
