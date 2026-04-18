@@ -9,7 +9,36 @@
   <link rel="stylesheet" href="styles/sprites.css">
 </head>
 <body>
-  <div id="stage"></div>
+  <div id="stage">
+    <div class="win">
+      <div class="win__titlebar">
+        <div class="win__icon"></div>
+        <div class="win__title" id="title">Defragmenting Drive C</div>
+        <div class="win__btn">_</div>
+        <div class="win__btn">▢</div>
+        <div class="win__btn">×</div>
+      </div>
+      <div class="win__menubar">
+        <span><u>F</u>ile</span>
+        <span><u>V</u>iew</span>
+        <span><u>H</u>elp</span>
+      </div>
+      <div class="win__body">
+        <div class="display-frame" id="display"></div>
+        <div class="statusrow">
+          <div class="statusrow__text" id="status-text">Ready</div>
+          <div class="statusrow__progress"><div id="progress-bar"></div></div>
+          <div class="statusrow__pct" id="status-pct">0% Complete</div>
+          <div class="statusrow__btns">
+            <button class="btn"><u>S</u>top</button>
+            <button class="btn"><u>P</u>ause</button>
+            <button class="btn"><u>L</u>egend</button>
+            <button class="btn">Hide <u>D</u>etails</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <script type="module" src="src/boot.js"></script>
 </body>
 </html>
