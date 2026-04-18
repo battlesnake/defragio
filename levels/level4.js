@@ -18,7 +18,7 @@ export default {
     row([[8, '.'], [3, 'Y'], [25, '.'], [3, 'Y'], [18, '.'], [3, 'Y']]),  // 9 — high stable platforms (escape route)
     row([[57, '.'], [3, 'Y']]),                     // 10
     row([[57, '.'], [3, 'Y']]),                     // 11
-    row([[2, '.'], [1, 'P'], [54, '.'], [3, 'Y']]),  // 12
+    row([[2, '.'], [1, 'P'], [50, '.'], [3, 'Y'], [1, '.'], [3, 'Y']]),  // 12 — stepping stones at 53-55
     row([                                           // 13 — uniform floor; events carve it
       [56, '~'], [1, 'B'], [3, 'Y'],
     ]),

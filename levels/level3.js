@@ -60,5 +60,10 @@ export default {
       { row: 13, col: 26 }, { row: 13, col: 27 },
       { row: 13, col: 28 }, { row: 13, col: 29 },
     ] },
+    // Stepping stones at row 12 just before the goal tower, so the player
+    // has a launch pad from which to jump-and-right onto the goal cells.
+    { time: 8.5, type: 'write', cells: [
+      { row: 12, col: 52 }, { row: 12, col: 53 }, { row: 12, col: 54 },
+    ] },
   ],
 };
