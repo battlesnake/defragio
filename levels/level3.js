@@ -53,17 +53,26 @@ export default {
       { row: 13, col: 26 }, { row: 13, col: 27 },
       { row: 13, col: 28 }, { row: 13, col: 29 },
     ] },
-    // Staircase up to the high goal — fires as the player is reaching the
-    // final column. Crushes the player if they're standing in any of these
-    // cells when the write completes (~1s after start), so the player must
-    // back off to col 52 or earlier and let the stairs solidify before
-    // climbing.
-    { time: 7.5, type: 'write', cells: [
-      { row: 12, col: 53 },
-      { row: 11, col: 54 },
-      { row: 10, col: 55 },
-      { row: 9,  col: 56 },
-      { row: 8,  col: 57 },
+    // Staircase up to the high goal. Triggered by the player crossing col 50
+    // (so timing matches their arrival regardless of speed). Each tier of
+    // the staircase spans all the way to the right edge so the player
+    // can't slip past or get stuck in a gap — anyone caught in a writing
+    // cell when it solidifies (~1s later) gets crushed. Back off to ≤col 52
+    // and let the stairs form, then climb.
+    { col: 50, type: 'write', cells: [
+      // bottom row of stairs (cols 53-59)
+      { row: 12, col: 53 }, { row: 12, col: 54 }, { row: 12, col: 55 },
+      { row: 12, col: 56 }, { row: 12, col: 57 }, { row: 12, col: 58 }, { row: 12, col: 59 },
+      // next tier up (cols 54-59)
+      { row: 11, col: 54 }, { row: 11, col: 55 }, { row: 11, col: 56 },
+      { row: 11, col: 57 }, { row: 11, col: 58 }, { row: 11, col: 59 },
+      // tier (cols 55-59)
+      { row: 10, col: 55 }, { row: 10, col: 56 }, { row: 10, col: 57 },
+      { row: 10, col: 58 }, { row: 10, col: 59 },
+      // tier (cols 56-59)
+      { row: 9, col: 56 }, { row: 9, col: 57 }, { row: 9, col: 58 }, { row: 9, col: 59 },
+      // top tier just under the goal (cols 57-59)
+      { row: 8, col: 57 }, { row: 8, col: 58 }, { row: 8, col: 59 },
     ] },
   ],
 };

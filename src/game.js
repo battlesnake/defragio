@@ -121,7 +121,10 @@ function transitionToLevel(game, idx) {
 function processEvents(game) {
   for (const e of game.pendingEvents) {
     if (e.triggered) continue;
-    if (game.t >= e.time) {
+    let fire = false;
+    if (e.col !== undefined) fire = game.player.x >= e.col;
+    else if (e.time !== undefined) fire = game.t >= e.time;
+    if (fire) {
       scheduleScriptedOp(game.defrag, e.type, e.cells, 0, EVENT_TELL_DUR);
       e.triggered = true;
     }
@@ -360,17 +363,13 @@ function die(game, reason, camera) {
   game.deathReason = reason;
   game.deathCamera = camera;
 
-  if (reason !== 'fell') {
-    // Mario-style: bounce up, fall through the level, then morph to text.
-    // Skipped only when the player is already falling off the bottom.
-    game.state = 'death-bounce';
-    game.player.vx = 0;
-    game.player.vy = -28;
-    game.player.onGround = false;
-    game.player.jumping = false;
-    game.player.invulnTime = 1e9;
-    return;
-  }
+  // Mario-style bounce for every death cause.
+  game.state = 'death-bounce';
+  game.player.vx = 0;
+  game.player.vy = -28;
+  game.player.onGround = false;
+  game.player.jumping = false;
+  game.player.invulnTime = 1e9;
   game.state = 'dying';
   startDeathTextAnimation(game, camera);
 }
