@@ -9,11 +9,11 @@ import { CONFIG } from '../../config.js';
 
 // Tunable constants.
 const PAUSE_BEFORE   = 1.0;
-const KICKSTART      = 6.0;   // initial tangential velocity (cells/sec)
-const TANGENTIAL_F   = 22;    // continuous tangential force
-const RADIAL_F       = 4;     // continuous inward pull
-const DRAG           = 0.6;
-const DRAIN_RADIUS   = 0.7;
+const KICKSTART      = 1.5;   // initial tangential velocity (cells/sec) — gentle
+const TANGENTIAL_F   = 12;    // continuous tangential force (maintains swirl far out)
+const RADIAL_F       = 7;     // continuous inward pull (dominates near center)
+const DRAG           = 2.0;   // bleeds energy fast — no infinite orbits
+const DRAIN_RADIUS   = 0.8;
 const Y_SCALE_FOR_DIST = (CONFIG.CELL_W + CONFIG.CELL_GAP) / (CONFIG.CELL_H + CONFIG.CELL_GAP);
 // ^ cells are taller than wide; scale y when computing distance so the
 //   vortex looks circular on screen rather than oval.
@@ -63,10 +63,11 @@ export function tickFlush(flush, dt) {
     const tx = -ry;
     const ty = rx;
 
-    // Closer = stronger pull, less swirl
+    // Far from center: maintain orbit (strong tangential, moderate pull).
+    // Close to center: drain hard (weak tangential, strong pull).
     const distEffect = Math.min(1, 4 / d);
-    const fr = RADIAL_F * (1 + 1.5 * distEffect);
-    const ft = TANGENTIAL_F * (0.4 + 0.4 * distEffect);
+    const fr = RADIAL_F * (0.6 + 1.8 * distEffect);
+    const ft = TANGENTIAL_F * (1.0 - 0.7 * distEffect);
 
     p.vx += (rx * fr + tx * ft) * dt;
     p.vy += (ry * fr + ty * ft) * dt * Y_SCALE_FOR_DIST;

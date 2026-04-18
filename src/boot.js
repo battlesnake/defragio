@@ -48,7 +48,7 @@ function frame(now) {
     resetCamera(camera);
   }
   prevState = game.state;
-  updateCamera(camera, game.player);
+  updateCamera(camera, game.player, level.width);
   const showActors = game.state === 'playing';
   const particles = game.state === 'flushing' && game.flush ? game.flush.particles : null;
   paintGrid(
