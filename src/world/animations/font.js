@@ -31,9 +31,11 @@ export const FONT = {
   'A': [
     '.XXX.', 'X...X', 'X...X', 'XXXXX', 'X...X', 'X...X', 'X...X',
   ],
-  // Cyrillic Л — narrower top + slanted legs to distinguish from П.
+  // Cyrillic Л — like П but with a flick at the bottom-left of the
+  // left leg. Right leg stays straight; left leg jogs out one cell at
+  // the bottom row.
   'Л': [
-    '.XXX.', '.X.X.', '.X.X.', '.X.X.', '.X.X.', 'X...X', 'X...X',
+    'XXXXX', '.X..X', '.X..X', '.X..X', '.X..X', '.X..X', 'X...X',
   ],
   'W': [
     'X...X', 'X...X', 'X...X', 'X.X.X', 'X.X.X', 'XX.XX', 'X...X',
