@@ -82,13 +82,16 @@ export function paintGrid(renderer, level, camera, defrag, enemies = [], player 
     }
   }
 
-  // 5. Player on top
+  // 5. Player on top — flicker (skip render every other tick) while invulnerable
   if (player) {
-    const worldCol = Math.floor(player.x);
-    const worldRow = Math.floor(player.y);
-    const localCol = worldCol - xOffset;
-    if (localCol >= 0 && localCol < viewportCols && worldRow >= 0 && worldRow < viewportRows) {
-      cells[worldRow * viewportCols + localCol].className = 'cell cell--player';
+    const flicker = player.invulnTime > 0 && Math.floor(player.invulnTime * 12) % 2 === 0;
+    if (!flicker) {
+      const worldCol = Math.floor(player.x);
+      const worldRow = Math.floor(player.y);
+      const localCol = worldCol - xOffset;
+      if (localCol >= 0 && localCol < viewportCols && worldRow >= 0 && worldRow < viewportRows) {
+        cells[worldRow * viewportCols + localCol].className = 'cell cell--player';
+      }
     }
   }
 }

@@ -358,6 +358,19 @@ export function tick(game, dt, keystate, camera) {
 
 function die(game, reason, camera) {
   if (game.state !== 'playing') return;
+  if (game.player.invulnTime > 0.05) return;
+
+  // Sonic-style coin shield: if the player has any coins, getting hit by an
+  // enemy / bad sector / crush costs ALL their coins + grants ~1.5s of
+  // flicker invulnerability instead of taking a life.
+  const isHit = reason === 'enemy' || reason === 'bad_sector' || reason === 'crushed';
+  if (isHit && game.score > 0) {
+    game.score = 0;
+    game.player.invulnTime = 1.5;
+    play('death');
+    return;
+  }
+
   game.lives -= 1;
   play('death');
   game.deathReason = reason;
