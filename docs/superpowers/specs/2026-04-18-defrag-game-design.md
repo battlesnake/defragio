@@ -76,7 +76,7 @@ Authentic Win98 categories preserved:
 | `:` | Unoptimized data (diagonal) | Diagonal stripes cyan | Same as `~`; pattern variety. |
 | `'` | Unoptimized data (dotted) | Dotted cyan | Same as `~`; pattern variety. |
 | `O` | Optimized data | Solid blue `#0000a8` | Stable platform once defrag has finished it. |
-| `.` | Free space | White interior, gray outline | Empty. Pit. |
+| `.` | Free space | No border, no fill — pure white grid background | Empty. Pit. Visually indistinguishable from the gap between cells; the absence of a block IS the free space. |
 | `Y` | Won't move (system) | Dark cross-hatch | Stable platform. Never changes during a level. |
 | `B` | Bad sector | Solid red `#d80000` | Stable. Permanent death on touch. |
 | `r` | Reading (tell) | Green `#00c000` flashing | Cyan block in the next ~1s; will become free space. Player warning to leap. |
@@ -269,7 +269,10 @@ Enemies in level 1:
 ### Rendering
 
 - DOM grid using CSS Grid. One `<div>` per cell. Each cell has a CSS class
-  per type, plus animation classes for tells and the cursor.
+  per type, plus animation classes for tells and the cursor. Free-space
+  cells render as a `<div>` with no border and no background — the grid's
+  white background shows through, matching the authentic Win98 appearance
+  where free space is indistinguishable from the gap between blocks.
 - Cell pool of size `viewport_cols × grid_rows` (≈ ~80 × 16 ≈ 1280 cells).
   Pool is recycled as the camera scrolls — when the camera moves right by
   one column, the leftmost column of cells gets repurposed as the new
