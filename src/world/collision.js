@@ -8,6 +8,17 @@ export function resolveCollisions(player, level) {
   player.onGround = false;
   resolveY(player, level);
   resolveX(player, level);
+
+  // Hard clamp to level horizontal bounds so the player can't walk off
+  // the left or right edge (and then fall to their death).
+  const half = player.width / 2;
+  if (player.x < half) {
+    player.x = half;
+    if (player.vx < 0) player.vx = 0;
+  } else if (player.x > level.width - half) {
+    player.x = level.width - half;
+    if (player.vx > 0) player.vx = 0;
+  }
 }
 
 function resolveY(player, level) {
