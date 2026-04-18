@@ -1,13 +1,12 @@
 import { CONFIG } from '../config.js';
-import { cursorMean } from '../world/cursor.js';
 
 export function createCamera() {
   return { x: 0, viewportCols: CONFIG.VIEWPORT_COLS };
 }
 
-export function updateCamera(camera, player, cursor) {
-  const targetByPlayer = player.x - camera.viewportCols / 3;
-  const targetByCursor = cursorMean(cursor) - 2;
-  camera.x = Math.max(targetByPlayer, targetByCursor, 0);
+// Player-only follow. Integer-snapped (tile-by-tile scrolling).
+export function updateCamera(camera, player) {
+  const targetX = Math.floor(player.x - camera.viewportCols / 3);
+  camera.x = Math.max(0, targetX);
   return camera;
 }

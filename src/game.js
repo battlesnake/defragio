@@ -9,12 +9,18 @@ import { isLethal, isCheckpoint, isGoal } from './world/tile.js';
 import { createCheckpointTracker, recordCheckpoint, lastCheckpoint } from './world/checkpoint.js';
 import { spawnEnemies, tickEnemies } from './enemies/registry.js';
 import { play } from './audio/sounds.js';
+import { CONFIG } from './config.js';
 
 export function createGameState(level) {
   return {
     level,
     player: createPlayer(level.playerStart),
-    cursor: createCursor({ levelId: level.id, height: level.height, speed: level.cursorSpeed }),
+    cursor: createCursor({
+      levelId: level.id,
+      height: level.height,
+      speed: level.cursorSpeed,
+      initialOffset: CONFIG.CURSOR_INITIAL_OFFSET,
+    }),
     jumpBuffer: createJumpBuffer(),
     checkpoints: createCheckpointTracker(level.playerStart),
     enemies: spawnEnemies(level),
@@ -54,7 +60,9 @@ export function tick(game, dt, keystate) {
 
   if (wasOnGround && !player.onGround) recordLeftGround(jumpBuffer, game.t);
 
-  advanceCursor(cursor, dt);
+  if (game.t > CONFIG.CURSOR_START_DELAY_SEC) {
+    advanceCursor(cursor, dt);
+  }
 
   // --- Enemies ---
   tickEnemies(game.enemies, dt);
@@ -110,7 +118,12 @@ function die(game, reason) {
   }
   const cp = lastCheckpoint(game.checkpoints);
   const newPlayer = createPlayer(cp);
-  game.cursor = createCursor({ levelId: game.level.id, height: game.level.height, speed: game.level.cursorSpeed });
+  game.cursor = createCursor({
+    levelId: game.level.id,
+    height: game.level.height,
+    speed: game.level.cursorSpeed,
+    initialOffset: CONFIG.CURSOR_INITIAL_OFFSET,
+  });
   game.player = newPlayer;
   game.jumpBuffer = createJumpBuffer();
   game.t = 0;

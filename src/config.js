@@ -14,6 +14,8 @@ export const CONFIG = {
 
   CURSOR_SEED_BASE:  100,
   CURSOR_NUM_ROWS_DEFAULT: 16,
+  CURSOR_INITIAL_OFFSET: 8,        // start cursor 8 cells off-screen-left
+  CURSOR_START_DELAY_SEC: 4,       // wait 4s before defrag begins advancing
 
   VIEWPORT_COLS: 50,
 };

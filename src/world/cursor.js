@@ -1,10 +1,10 @@
 import { CONFIG } from '../config.js';
 import { makeRowPhases, rowOffset } from '../util/noise.js';
 
-export function createCursor({ levelId, height, speed }) {
+export function createCursor({ levelId, height, speed, initialOffset = 0 }) {
   const seed = (CONFIG.CURSOR_SEED_BASE + levelId) >>> 0;
   return {
-    baseX: 0,
+    baseX: -initialOffset,
     speed,
     height,
     t: 0,

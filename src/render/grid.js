@@ -1,4 +1,5 @@
 import { cellClassFor } from '../world/tile.js';
+import { cursorAtRow } from '../world/cursor.js';
 
 // Creates a fixed pool of cells sized to viewport. Repaints by setting className.
 export function createGridRenderer({ container, viewportCols, viewportRows, cellWidth = 10, cellHeight = 14 }) {
@@ -30,10 +31,13 @@ export function createGridRenderer({ container, viewportCols, viewportRows, cell
   };
 }
 
-// Paints the visible window of the level given the camera offset.
-export function paintGrid(renderer, level, camera) {
+// Paints the visible window: tiles → cursor cells → enemies → player.
+// Camera.x is integer (tile-snapped), no sub-pixel transform.
+export function paintGrid(renderer, level, camera, cursor, enemies = [], player = null) {
   const { cells, viewportCols, viewportRows } = renderer;
-  const xOffset = Math.floor(camera.x);
+  const xOffset = camera.x;
+
+  // 1. Base tiles
   for (let r = 0; r < viewportRows; r++) {
     for (let c = 0; c < viewportCols; c++) {
       const worldCol = xOffset + c;
@@ -44,6 +48,36 @@ export function paintGrid(renderer, level, camera) {
       cells[r * viewportCols + c].className = `cell ${tileClass}`;
     }
   }
-  const subPx = (camera.x - xOffset) * (renderer.cellWidth + 1);
-  renderer.grid.style.transform = `translateX(${-subPx}px)`;
+
+  // 2. Cursor (one cell per row at floor(cursorAtRow))
+  if (cursor) {
+    for (let r = 0; r < cursor.height && r < viewportRows; r++) {
+      const cursorWorldCol = Math.floor(cursorAtRow(cursor, r));
+      const localCol = cursorWorldCol - xOffset;
+      if (localCol >= 0 && localCol < viewportCols) {
+        cells[r * viewportCols + localCol].className = 'cell cell--cursor';
+      }
+    }
+  }
+
+  // 3. Enemies (overwrite the cell at floor(e.x), floor(e.y))
+  for (const e of enemies) {
+    if (!e.alive) continue;
+    const worldCol = Math.floor(e.x);
+    const worldRow = Math.floor(e.y);
+    const localCol = worldCol - xOffset;
+    if (localCol >= 0 && localCol < viewportCols && worldRow >= 0 && worldRow < viewportRows) {
+      cells[worldRow * viewportCols + localCol].className = `cell cell--${e.type}`;
+    }
+  }
+
+  // 4. Player (always on top)
+  if (player) {
+    const worldCol = Math.floor(player.x);
+    const worldRow = Math.floor(player.y);
+    const localCol = worldCol - xOffset;
+    if (localCol >= 0 && localCol < viewportCols && worldRow >= 0 && worldRow < viewportRows) {
+      cells[worldRow * viewportCols + localCol].className = 'cell cell--player';
+    }
+  }
 }
