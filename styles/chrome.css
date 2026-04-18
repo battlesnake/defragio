@@ -153,11 +153,13 @@
   vertical-align: middle;
 }
 .legend-modal__body table.legend-blocks td:first-child { width: 18px; }
-.legend-modal__body table.legend-blocks td.legend-sub { padding-left: 16px; }
 .legend-modal__body table.legend-blocks td.legend-subhead {
   padding-top: 6px;
   font-weight: bold;
 }
+/* Indent the entire sub-item row (swatch + label) under "Unoptimized data that:" */
+.legend-modal__body table.legend-blocks tr.legend-row-sub td:first-child { padding-left: 16px; }
+.legend-modal__body table.legend-blocks tr.legend-row-sub td:first-child { width: 30px; }
 .legend-swatch {
   display: inline-block;
   width: 10px;
