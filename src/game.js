@@ -17,6 +17,7 @@ export function createGameState(level) {
     jumpBuffer: createJumpBuffer(),
     checkpoints: createCheckpointTracker(level.playerStart),
     enemies: spawnEnemies(level),
+    lives: 3,
     t: 0,
     state: 'playing',
     deathReason: null,
@@ -97,8 +98,13 @@ export function tick(game, dt, keystate) {
 }
 
 function die(game, reason) {
+  game.lives -= 1;
   game.state = 'dying';
   game.deathReason = reason;
+  if (game.lives <= 0) {
+    game.state = 'gameover';
+    return;
+  }
   const cp = lastCheckpoint(game.checkpoints);
   const newPlayer = createPlayer(cp);
   game.cursor = createCursor({ levelId: game.level.id, height: game.level.height, speed: game.level.cursorSpeed });

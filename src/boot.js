@@ -6,6 +6,7 @@ import { createGridRenderer, paintGrid } from './render/grid.js';
 import { createPlayerSprite, positionPlayerSprite } from './render/player-sprite.js';
 import { createCursorSprite, positionCursorSprite } from './render/cursor-sprite.js';
 import { createEnemyRenderer, paintEnemies } from './render/enemy-sprite.js';
+import { bindChrome, updateChrome } from './render/chrome.js';
 import { createKeyState, attachKeyState } from './input/keystate.js';
 import level1 from '../levels/level1.js';
 
@@ -36,6 +37,7 @@ const enemyRenderer = createEnemyRenderer(overlay);
 
 const keystate = createKeyState();
 attachKeyState(keystate);
+bindChrome();
 
 const FIXED_DT = 1 / 60;
 let acc = 0;
@@ -55,6 +57,7 @@ function frame(now) {
   positionPlayerSprite(playerEl, game.player, camera);
   positionCursorSprite(cursorEls, game.cursor, camera);
   paintEnemies(enemyRenderer, game.enemies, camera);
+  updateChrome(game);
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
