@@ -1,0 +1,103 @@
+.grid {
+  display: grid;
+  grid-auto-rows: 14px;
+  gap: 1px;
+  background: #fff;
+  width: max-content;
+}
+.cell {
+  width: 10px;
+  height: 14px;
+  box-sizing: border-box;
+  border: 1px solid;
+  image-rendering: pixelated;
+}
+
+/* FREE: no border, no background — pure white grid bg shows through. */
+.cell--free {
+  border: none;
+  background: transparent;
+}
+
+/* Unoptimized data — three pattern variants */
+.cell--cyan-solid {
+  background: #00b0b0;
+  border-color: #006666;
+}
+.cell--cyan-diag {
+  background: repeating-linear-gradient(-45deg, #00d8d8 0 2px, #006666 2px 3px);
+  border-color: #004444;
+}
+.cell--cyan-dots {
+  background:
+    radial-gradient(#004444 0.6px, transparent 0.7px) 0 0 / 3px 3px,
+    #00b0b0;
+  border-color: #004444;
+}
+
+/* Optimized data: solid blue */
+.cell--opt {
+  background: #0000a8;
+  border-color: #000044;
+}
+
+/* Won't move (system): dark cross-hatch */
+.cell--sys {
+  background: repeating-linear-gradient(-45deg, #404040 0 2px, #606060 2px 3px);
+  border-color: #000;
+}
+
+/* Bad sector */
+.cell--bad {
+  background: #d80000;
+  border-color: #800000;
+}
+
+/* Reading tell — green flashing */
+.cell--read {
+  background: #00c000;
+  border-color: #006600;
+  animation: blinkR 0.55s steps(2) infinite;
+}
+@keyframes blinkR { 50% { background: #88ff88; } }
+
+/* Writing tell — red flashing */
+.cell--write {
+  background: #ff4040;
+  border-color: #800000;
+  animation: blinkW 0.55s steps(2) infinite;
+}
+@keyframes blinkW { 50% { background: #ffaaaa; } }
+
+/* Defrag cursor (per-row jagged) */
+.cell--cursor {
+  background: #00ff00;
+  border-color: #008800;
+  box-shadow: 0 0 4px 1px #00ff00, inset 0 0 0 1px #ccffcc;
+  animation: cursorPulse 0.4s steps(2) infinite;
+}
+@keyframes cursorPulse {
+  50% { background: #88ff88; box-shadow: 0 0 6px 2px #88ff88; }
+}
+
+/* Goal */
+.cell--goal {
+  background: repeating-linear-gradient(45deg, #ff00ff 0 2px, #800080 2px 3px);
+  border-color: #400040;
+  animation: pulseGoal 1.2s ease-in-out infinite;
+}
+@keyframes pulseGoal { 50% { box-shadow: 0 0 4px 1px #ff00ff; } }
+
+/* Checkpoint */
+.cell--checkpoint {
+  background:
+    radial-gradient(#fff 0.8px, transparent 1px) 0 0 / 3px 3px,
+    #008000;
+  border-color: #004000;
+}
+
+/* Fragile */
+.cell--fragile {
+  background: repeating-linear-gradient(90deg, #c0a000 0 2px, #604000 2px 3px);
+  border-color: #402000;
+}
