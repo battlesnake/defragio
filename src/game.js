@@ -7,6 +7,7 @@ import { createJumpBuffer, recordJumpPress, recordLeftGround, tickBuffer, canJum
 import { consumeEdges } from './input/keystate.js';
 import { isLethal, isCheckpoint, isGoal } from './world/tile.js';
 import { createCheckpointTracker, recordCheckpoint, lastCheckpoint } from './world/checkpoint.js';
+import { spawnEnemies, tickEnemies } from './enemies/registry.js';
 
 export function createGameState(level) {
   return {
@@ -15,6 +16,7 @@ export function createGameState(level) {
     cursor: createCursor({ levelId: level.id, height: level.height, speed: level.cursorSpeed }),
     jumpBuffer: createJumpBuffer(),
     checkpoints: createCheckpointTracker(level.playerStart),
+    enemies: spawnEnemies(level),
     t: 0,
     state: 'playing',
     deathReason: null,
@@ -51,6 +53,22 @@ export function tick(game, dt, keystate) {
   if (wasOnGround && !player.onGround) recordLeftGround(jumpBuffer, game.t);
 
   advanceCursor(cursor, dt);
+
+  // --- Enemies ---
+  tickEnemies(game.enemies, dt);
+
+  for (const e of game.enemies) {
+    if (!e.alive) continue;
+    if (Math.abs(e.x - player.x) < 0.6 && Math.abs(e.y - player.y) < 0.6) {
+      if (player.vy > 0 && (player.y < e.y - 0.1)) {
+        e.alive = false;
+        player.vy = -10;
+      } else {
+        die(game, 'enemy');
+        return;
+      }
+    }
+  }
 
   // --- Touch detection: checkpoint, goal, lethal ---
   const cellRow = Math.floor(player.y);

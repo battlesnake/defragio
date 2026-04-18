@@ -5,6 +5,7 @@ import { createCamera, updateCamera } from './render/camera.js';
 import { createGridRenderer, paintGrid } from './render/grid.js';
 import { createPlayerSprite, positionPlayerSprite } from './render/player-sprite.js';
 import { createCursorSprite, positionCursorSprite } from './render/cursor-sprite.js';
+import { createEnemyRenderer, paintEnemies } from './render/enemy-sprite.js';
 import { createKeyState, attachKeyState } from './input/keystate.js';
 import level1 from '../levels/level1.js';
 
@@ -31,6 +32,7 @@ display.appendChild(overlay);
 
 const playerEl = createPlayerSprite(overlay);
 const cursorEls = createCursorSprite(overlay, level.height);
+const enemyRenderer = createEnemyRenderer(overlay);
 
 const keystate = createKeyState();
 attachKeyState(keystate);
@@ -52,6 +54,7 @@ function frame(now) {
   paintGrid(renderer, level, camera);
   positionPlayerSprite(playerEl, game.player, camera);
   positionCursorSprite(cursorEls, game.cursor, camera);
+  paintEnemies(enemyRenderer, game.enemies, camera);
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
