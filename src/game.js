@@ -199,6 +199,17 @@ export function tick(game, dt, keystate, camera) {
     return;
   }
 
+  // Game over — wait briefly so the YOU LOSE text can be read, then any
+  // keypress starts a brand-new game.
+  if (game.state === 'gameover') {
+    game.gameoverElapsed = (game.gameoverElapsed || 0) + dt;
+    if (game.gameoverElapsed >= 1.5 && keystate.pressed.size > 0) {
+      const fresh = createGameState();
+      Object.assign(game, fresh);
+    }
+    return;
+  }
+
   if (game.state !== 'playing') return;
 
   const { player, defrag, jumpBuffer, level } = game;
@@ -323,6 +334,7 @@ function win(game, camera) {
 function respawnOrGameOver(game) {
   if (game.lives <= 0) {
     game.state = 'gameover';
+    game.gameoverElapsed = 0;
     return;
   }
   restoreTiles(game.level, game.tilesSnapshot);
