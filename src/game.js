@@ -2,7 +2,7 @@ import { createPlayer } from './player/state.js';
 import { applyGravity, integrate, applyHorizontalIntent } from './player/physics.js';
 import { startJump, releaseJump } from './player/jump.js';
 import { resolveCollisions } from './world/collision.js';
-import { createDefrag, advanceDefrag } from './world/defrag.js';
+import { createDefrag, advanceDefrag, scheduleScriptedOp } from './world/defrag.js';
 import {
   startDeathAnimation,
   startFlushAnimation, tickFlush, isFlushDone,
@@ -15,6 +15,10 @@ import { createCheckpointTracker, recordCheckpoint, lastCheckpoint } from './wor
 import { spawnEnemies, tickEnemies } from './enemies/registry.js';
 import { play } from './audio/sounds.js';
 import { CONFIG } from './config.js';
+import { loadLevel } from './world/level-loader.js';
+import { levels } from '../levels/index.js';
+
+const EVENT_TELL_DUR = 1.0;
 
 function snapshotTiles(level) {
   return level.tiles.map(row => row.slice());
@@ -26,19 +30,16 @@ function restoreTiles(level, snapshot) {
     }
   }
 }
-function clearTiles(level) {
-  for (let r = 0; r < level.height; r++) {
-    for (let c = 0; c < level.width; c++) {
-      level.tiles[r][c] = 0; // TILE.FREE
-    }
-  }
+
+function pendingEvents(level) {
+  return (level.events || []).map(e => ({ ...e, triggered: false }));
 }
 
-export function createGameState(level) {
-  const tilesSnapshot = snapshotTiles(level);
+// Builds fresh per-level state. `level` is a loaded (mutated-on-the-fly) level.
+function freshLevelState(level) {
   return {
     level,
-    tilesSnapshot,
+    tilesSnapshot: snapshotTiles(level),
     player: createPlayer(level.playerStart),
     defrag: createDefrag({
       levelId: level.id,
@@ -49,8 +50,19 @@ export function createGameState(level) {
     jumpBuffer: createJumpBuffer(),
     checkpoints: createCheckpointTracker(level.playerStart),
     enemies: spawnEnemies(level),
-    lives: 3,
+    pendingEvents: pendingEvents(level),
     t: 0,
+  };
+}
+
+export function createGameState(initialLevelIdx = 0) {
+  const level = loadLevel(levels[initialLevelIdx]);
+  const base = freshLevelState(level);
+  return {
+    ...base,
+    levels,
+    levelIdx: initialLevelIdx,
+    lives: 3,
     state: 'playing',
     deathReason: null,
     animationDoneAt: 0,
@@ -58,7 +70,34 @@ export function createGameState(level) {
   };
 }
 
-export function tick(game, dt, keystate) {
+function transitionToLevel(game, idx) {
+  const wrappedIdx = idx % game.levels.length;
+  const level = loadLevel(game.levels[wrappedIdx]);
+  const fresh = freshLevelState(level);
+  game.level         = fresh.level;
+  game.tilesSnapshot = fresh.tilesSnapshot;
+  game.player        = fresh.player;
+  game.defrag        = fresh.defrag;
+  game.jumpBuffer    = fresh.jumpBuffer;
+  game.checkpoints   = fresh.checkpoints;
+  game.enemies       = fresh.enemies;
+  game.pendingEvents = fresh.pendingEvents;
+  game.t             = fresh.t;
+  game.levelIdx      = wrappedIdx;
+  game.flush         = null;
+}
+
+function processEvents(game) {
+  for (const e of game.pendingEvents) {
+    if (e.triggered) continue;
+    if (game.t >= e.time) {
+      scheduleScriptedOp(game.defrag, e.type, e.cells, 0, EVENT_TELL_DUR);
+      e.triggered = true;
+    }
+  }
+}
+
+export function tick(game, dt, keystate, camera) {
   // Death animation phase
   if (game.state === 'dying') {
     game.t += dt;
@@ -67,35 +106,40 @@ export function tick(game, dt, keystate) {
     return;
   }
 
-  // Win → flush vortex phase
+  // Flush vortex phase
   if (game.state === 'flushing') {
     game.t += dt;
     tickFlush(game.flush, dt);
     if (isFlushDone(game)) {
+      // Empty the level entirely (any solid cells the flush did not consume
+      // should be wiped before defrag-in writes the next level back in).
+      const lvl = game.level;
+      for (let r = 0; r < lvl.height; r++) {
+        for (let c = 0; c < lvl.width; c++) lvl.tiles[r][c] = 0;
+      }
+      // Advance to the next level. tilesSnapshot for defrag-in must be the
+      // NEW level's data, but the level grid itself stays empty for now.
+      const nextIdx = (game.levelIdx + 1) % game.levels.length;
+      const nextRaw = game.levels[nextIdx];
+      const nextLoaded = loadLevel(nextRaw);
+      game.tilesSnapshot = snapshotTiles(nextLoaded);
+      // Stash the next-level metadata (we'll switch to it after defrag-in)
+      game._pendingNextIdx = nextIdx;
       game.state = 'defragging-in';
       startDefragInAnimation(game);
     }
     return;
   }
 
-  // Defrag-in phase: write the next level back in
+  // Defrag-in phase: writes paint the new level back in
   if (game.state === 'defragging-in') {
     game.t += dt;
     advanceDefrag(game.defrag, dt);
     if (game.t >= game.animationDoneAt) {
-      // Loop level 1 for now (no level 2 yet)
-      game.flush = null;
-      game.player = createPlayer(game.level.playerStart);
-      game.defrag = createDefrag({
-        levelId: game.level.id,
-        level: game.level,
-        speed: game.level.cursorSpeed,
-        initialOffset: CONFIG.CURSOR_INITIAL_OFFSET,
-      });
-      game.jumpBuffer = createJumpBuffer();
-      game.enemies = spawnEnemies(game.level);
-      game.checkpoints = createCheckpointTracker(game.level.playerStart);
-      game.t = 0;
+      // Now actually transition to the next level (player, defrag, enemies, events)
+      transitionToLevel(game, game._pendingNextIdx ?? game.levelIdx);
+      game._pendingNextIdx = null;
+      game.player.invulnTime = 1.0;
       game.state = 'playing';
     }
     return;
@@ -106,6 +150,9 @@ export function tick(game, dt, keystate) {
   const { player, defrag, jumpBuffer, level } = game;
   game.t += dt;
   tickBuffer(jumpBuffer, game.t);
+
+  // Pre-scheduled level events (vanishing platforms, appearing bridges)
+  processEvents(game);
 
   const edges = consumeEdges(keystate);
   if (edges.has('jump')) recordJumpPress(jumpBuffer, game.t);
@@ -162,7 +209,7 @@ export function tick(game, dt, keystate) {
       recordCheckpoint(game.checkpoints, { row: cellRow, col: cellCol });
     }
     if (isGoal(here)) {
-      win(game);
+      win(game, camera);
       return;
     }
   }
@@ -187,11 +234,16 @@ function die(game, reason) {
   startDeathAnimation(game);
 }
 
-function win(game) {
+function win(game, camera) {
   if (game.state !== 'playing') return;
   play('levelComplete');
   game.state = 'flushing';
-  startFlushAnimation(game);
+  // Center the vortex at the viewport center, not the player position.
+  const center = {
+    x: (camera ? camera.x : 0) + (camera ? camera.viewportCols : game.level.width) / 2,
+    y: game.level.height / 2,
+  };
+  startFlushAnimation(game, center);
 }
 
 function respawnOrGameOver(game) {
@@ -211,6 +263,7 @@ function respawnOrGameOver(game) {
   });
   game.jumpBuffer = createJumpBuffer();
   game.enemies = spawnEnemies(game.level);
+  game.pendingEvents = pendingEvents(game.level);
   game.t = 0;
   game.state = 'playing';
 }

@@ -1,21 +1,18 @@
 import { CONFIG } from './config.js';
-import { loadLevel } from './world/level-loader.js';
 import { createGameState, tick } from './game.js';
 import { createCamera, updateCamera, resetCamera } from './render/camera.js';
 import { createGridRenderer, paintGrid } from './render/grid.js';
 import { bindChrome, updateChrome } from './render/chrome.js';
 import { loadSounds } from './audio/sounds.js';
 import { createKeyState, attachKeyState } from './input/keystate.js';
-import level1 from '../levels/level1.js';
 
-const level = loadLevel(level1);
-const game  = createGameState(level);
+const game = createGameState();
 
 const display = document.getElementById('display');
 const renderer = createGridRenderer({
   container: display,
   viewportCols: CONFIG.VIEWPORT_COLS,
-  viewportRows: level.height,
+  viewportRows: game.level.height,
   cellWidth: CONFIG.CELL_W,
   cellHeight: CONFIG.CELL_H,
 });
@@ -40,20 +37,19 @@ function frame(now) {
   last = t;
   acc += dt;
   while (acc >= FIXED_DT) {
-    tick(game, FIXED_DT, keystate);
+    tick(game, FIXED_DT, keystate, camera);
     acc -= FIXED_DT;
   }
-  // On respawn, reset the camera back to origin
   if (prevState !== 'playing' && game.state === 'playing') {
     resetCamera(camera);
   }
   prevState = game.state;
-  updateCamera(camera, game.player, level.width);
+  updateCamera(camera, game.player, game.level.width);
   const showActors = game.state === 'playing';
   const particles = game.state === 'flushing' && game.flush ? game.flush.particles : null;
   paintGrid(
     renderer,
-    level,
+    game.level,
     camera,
     game.defrag,
     showActors ? game.enemies : [],

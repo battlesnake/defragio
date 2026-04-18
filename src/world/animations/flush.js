@@ -99,10 +99,10 @@ export function tickFlush(flush, dt) {
   flush.aliveCount = alive;
 }
 
-export function startFlushAnimation(game) {
+export function startFlushAnimation(game, center) {
   pauseDefrag(game.defrag);
   clearDefragOps(game.defrag);
-  game.flush = createFlush(game.level, { x: game.player.x, y: game.player.y });
+  game.flush = createFlush(game.level, center);
   game.animationDoneAt = Infinity; // ends when isFlushDone() is true
 }
 

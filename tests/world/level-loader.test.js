@@ -69,3 +69,16 @@ test('Level 1 loads without error and has a player start', () => {
   assert.equal(lvl.tiles.length, 16);
   assert.equal(lvl.tiles[0].length, 60);
 });
+
+import { levels } from '../../levels/index.js';
+
+for (let i = 0; i < 5; i++) {
+  test(`Level ${i + 1} loads without error and is 60x16`, () => {
+    const lvl = loadLevel(levels[i]);
+    assert.equal(lvl.width, 60);
+    assert.equal(lvl.height, 16);
+    assert.equal(lvl.tiles.length, 16);
+    for (const row of lvl.tiles) assert.equal(row.length, 60);
+    assert.ok(lvl.playerStart);
+  });
+}
