@@ -10,5 +10,6 @@ export function createPlayer(start) {
     jumping: false,
     width: 1,
     height: 1,
+    invulnTime: 0,
   };
 }

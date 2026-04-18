@@ -1,5 +1,6 @@
 import { cellClassFor } from '../world/tile.js';
 import { defragOpAt } from '../world/defrag.js';
+import { CONFIG } from '../config.js';
 
 export function createGridRenderer({ container, viewportCols, viewportRows, cellWidth = 10, cellHeight = 14 }) {
   container.innerHTML = '';
@@ -55,12 +56,14 @@ export function paintGrid(renderer, level, camera, defrag, enemies = [], player 
     }
   }
 
-  // 3. Flush particles (overwrite tile underneath with the particle's tile type)
+  // 3. Flush particles (positions are in pixel space; map to grid cells)
   if (particles) {
+    const sx = CONFIG.CELL_W + CONFIG.CELL_GAP;
+    const sy = CONFIG.CELL_H + CONFIG.CELL_GAP;
     for (const p of particles) {
       if (!p.alive) continue;
-      const worldCol = Math.floor(p.x);
-      const worldRow = Math.floor(p.y);
+      const worldCol = Math.floor(p.px / sx);
+      const worldRow = Math.floor(p.py / sy);
       const localCol = worldCol - xOffset;
       if (localCol >= 0 && localCol < viewportCols && worldRow >= 0 && worldRow < viewportRows) {
         cells[worldRow * viewportCols + localCol].className = `cell ${cellClassFor(p.tileType)}`;

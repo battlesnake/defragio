@@ -134,15 +134,18 @@ export function tick(game, dt, keystate) {
   }
 
   tickEnemies(game.enemies, dt);
-  for (const e of game.enemies) {
-    if (!e.alive) continue;
-    if (Math.abs(e.x - player.x) < 0.6 && Math.abs(e.y - player.y) < 0.6) {
-      if (player.vy > 0 && (player.y < e.y - 0.1)) {
-        e.alive = false;
-        player.vy = -10;
-      } else {
-        die(game, 'enemy');
-        return;
+  if (player.invulnTime > 0) player.invulnTime -= dt;
+  if (player.invulnTime <= 0) {
+    for (const e of game.enemies) {
+      if (!e.alive) continue;
+      if (Math.abs(e.x - player.x) < 0.6 && Math.abs(e.y - player.y) < 0.6) {
+        if (player.vy > 0 && (player.y < e.y - 0.1)) {
+          e.alive = false;
+          player.vy = -10;
+        } else {
+          die(game, 'enemy');
+          return;
+        }
       }
     }
   }
@@ -199,6 +202,7 @@ function respawnOrGameOver(game) {
   restoreTiles(game.level, game.tilesSnapshot);
   const cp = lastCheckpoint(game.checkpoints);
   game.player = createPlayer(cp);
+  game.player.invulnTime = 1.5;
   game.defrag = createDefrag({
     levelId: game.level.id,
     level: game.level,
