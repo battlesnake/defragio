@@ -47,10 +47,14 @@
   border-color: #000;
 }
 
-/* Bad sector */
+/* Bad sector — white box with black border and a single red diagonal
+   line from top-left to bottom-right (mirrors the original Win98 defrag
+   marker, distinct from the red "writing" indicator). */
 .cell--bad {
-  background: #d80000;
-  border-color: #800000;
+  background:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 14' preserveAspectRatio='none'><line x1='0' y1='0' x2='10' y2='14' stroke='%23d80000' stroke-width='1.4'/></svg>") no-repeat center / 100% 100%,
+    #fff;
+  border-color: #000;
 }
 
 /* Reading tell — green flashing */

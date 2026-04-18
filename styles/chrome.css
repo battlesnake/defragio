@@ -149,10 +149,15 @@
   border-collapse: collapse;
 }
 .legend-modal__body table.legend-blocks td {
-  padding: 2px 4px;
+  padding: 1px 4px;
   vertical-align: middle;
 }
 .legend-modal__body table.legend-blocks td:first-child { width: 18px; }
+.legend-modal__body table.legend-blocks td.legend-sub { padding-left: 16px; }
+.legend-modal__body table.legend-blocks td.legend-subhead {
+  padding-top: 6px;
+  font-weight: bold;
+}
 .legend-swatch {
   display: inline-block;
   width: 10px;
@@ -177,7 +182,12 @@
   background: repeating-linear-gradient(-45deg, #404040 0 2px, #606060 2px 3px);
   border-color: #000;
 }
-.swatch--bad { background: #d80000; border-color: #800000; }
+.swatch--bad {
+  background:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 14' preserveAspectRatio='none'><line x1='0' y1='0' x2='10' y2='14' stroke='%23d80000' stroke-width='1.4'/></svg>") no-repeat center / 100% 100%,
+    #fff;
+  border-color: #000;
+}
 .swatch--checkpoint {
   background: radial-gradient(#fff 0.8px, transparent 1px) 0 0 / 3px 3px, #008000;
   border-color: #004000;

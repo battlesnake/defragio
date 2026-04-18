@@ -48,22 +48,23 @@
         <div class="win__btn" id="legend-close">×</div>
       </div>
       <div class="win__body legend-modal__body">
-        <h3>Block legend</h3>
         <table class="legend-blocks">
-          <tr><td><span class="legend-swatch swatch--cyan-solid"></span></td><td>Unoptimized data — defrag may move it</td></tr>
-          <tr><td><span class="legend-swatch swatch--cyan-diag"></span></td><td>Same; diagonal pattern variant</td></tr>
-          <tr><td><span class="legend-swatch swatch--cyan-dots"></span></td><td>Same; dotted pattern variant</td></tr>
-          <tr><td><span class="legend-swatch swatch--opt"></span></td><td>Optimized data — solid blue</td></tr>
-          <tr><td><span class="legend-swatch swatch--free"></span></td><td>Free space (empty cell — fall through)</td></tr>
-          <tr><td><span class="legend-swatch swatch--sys"></span></td><td>System / unmovable — never changes; safe platform</td></tr>
-          <tr><td><span class="legend-swatch swatch--bad"></span></td><td>Bad sector — touch = death</td></tr>
+          <tr><td><span class="legend-swatch swatch--opt"></span></td><td>Optimized (defragmented) data</td></tr>
+          <tr><td colspan="2" class="legend-subhead">Unoptimized data that:</td></tr>
+          <tr><td><span class="legend-swatch swatch--cyan-solid"></span></td><td class="legend-sub">Belongs at beginning of drive</td></tr>
+          <tr><td><span class="legend-swatch swatch--cyan-diag"></span></td><td class="legend-sub">Belongs in middle of drive</td></tr>
+          <tr><td><span class="legend-swatch swatch--cyan-dots"></span></td><td class="legend-sub">Belongs at end of drive</td></tr>
+          <tr><td><span class="legend-swatch swatch--free"></span></td><td>Free space</td></tr>
+          <tr><td><span class="legend-swatch swatch--sys"></span></td><td>Data that will not be moved</td></tr>
+          <tr><td><span class="legend-swatch swatch--bad"></span></td><td>Bad (damaged) area of the disk</td></tr>
+          <tr><td><span class="legend-swatch swatch--read"></span></td><td>Data that's currently being read</td></tr>
+          <tr><td><span class="legend-swatch swatch--write"></span></td><td>Data that's currently being written</td></tr>
+          <tr><td colspan="2" class="legend-subhead">Game-only:</td></tr>
+          <tr><td><span class="legend-swatch swatch--player"></span></td><td>You (the read head)</td></tr>
+          <tr><td><span class="legend-swatch swatch--goal"></span></td><td>Goal cluster — touch to clear the level</td></tr>
           <tr><td><span class="legend-swatch swatch--checkpoint"></span></td><td>Checkpoint — saves your respawn spot</td></tr>
           <tr><td><span class="legend-swatch swatch--fragile"></span></td><td>Fragile — cracks after one step</td></tr>
-          <tr><td><span class="legend-swatch swatch--goal"></span></td><td>Goal cluster — touch to clear the level</td></tr>
-          <tr><td><span class="legend-swatch swatch--coin"></span></td><td>Coin — collect (Sonic-style shield)</td></tr>
-          <tr><td><span class="legend-swatch swatch--read"></span></td><td>Reading (green flash) — block about to disappear</td></tr>
-          <tr><td><span class="legend-swatch swatch--write"></span></td><td>Writing (red flash) — empty space about to solidify</td></tr>
-          <tr><td><span class="legend-swatch swatch--player"></span></td><td>You (the read head)</td></tr>
+          <tr><td><span class="legend-swatch swatch--coin"></span></td><td>Coin — collect for points and protection</td></tr>
         </table>
         <p class="legend-foot">Each box represents one disk cluster.</p>
       </div>
