@@ -148,8 +148,11 @@ export function tick(game, dt, keystate, camera) {
   // No collision, no enemies, no defrag during the bounce.
   if (game.state === 'death-bounce') {
     game.t += dt;
-    applyGravity(game.player, dt);
-    integrate(game.player, dt);
+    // Use a lighter-than-normal gravity so the bounce reads as a clear
+    // animation rather than a half-frame blip. NO collision — the player
+    // clips through whatever's in the way as they fall.
+    game.player.vy += 35 * dt;
+    game.player.y  += game.player.vy * dt;
     if (game.player.y > game.level.height + 5) {
       game.state = 'dying';
       startDeathTextAnimation(game, game.deathCamera);
