@@ -119,24 +119,45 @@ of `~`/`:`/`'` for visual variety only.
 
 ## Threat: the defrag cursor
 
-A vertical column of bright-green flashing cells, one cell wide,
-spanning the full grid height. Starts at column 0 (or just off-screen left)
-when a level begins.
+A jagged "front" of bright-green flashing cells advancing rightward
+through the grid. NOT a perfectly straight column — different rows lead
+and trail in an irregular but predictable rhythm. Visually this gives the
+cursor an organic, wobbling profile instead of a mechanical wall.
 
-- **Movement:** Advances rightward at a steady speed (per-level constant).
-  Speed is chosen per level and increases across levels.
-- **Death:** If the cursor's column overtakes the player's column, the
-  player is immediately read away and dies.
-- **Camera:** The viewport tracks `max(player.x, cursor.x + small_offset)`,
-  meaning the player can run ahead and the cursor stays off-screen left,
-  but if the player slows, the cursor enters the viewport and applies
-  visible pressure.
-- **Effect on terrain:** Cells the cursor sweeps over become free space
+- **Per-row positions.** Each row has its own cursor x-position
+  `cursor[row]`. All rows advance at a base speed (per-level constant) plus
+  a small per-row offset that oscillates over time:
+  ```
+  cursor[row] = baseAdvance(t) + offset(row, t)
+  offset(row, t) = sum_i  amp_i * sin( 2π * (t / period_i + phase[row, i]) )
+  ```
+  Two or three sine components per row with different periods (e.g.,
+  ~2.7s, ~3.4s, ~4.1s) and amplitudes (e.g., ±1.5 cells, ±0.8 cells)
+  produce non-repeating wobble that feels organic but is fully
+  deterministic. Per-row phases are seeded from the level number so
+  cursor behavior is identical across runs of the same level (fairness).
+- **Visual.** At each frame, render the cursor as the cells at `cursor[row]`
+  for every row — a vertical-ish but jagged ribbon. Cells in this ribbon
+  flash green-cyan with the same animation as a "reading" tell, since they
+  literally are: the cursor IS the defrag's read head.
+- **Movement.** Base advance is the per-level cursor speed; total advance
+  for a row is `base + offset` so individual rows can briefly stall or
+  surge while the average creeps right at the level's speed.
+- **Death.** Check per row: if `cursor[playerRow] >= playerColumn`, the
+  player is read away. Because the cursor is irregular, sometimes the
+  player's row is the leading row (immediate danger), sometimes it's the
+  trailing row (breathing room) — read the cursor shape and pick a
+  horizontal lane accordingly.
+- **Camera.** Viewport tracks `max(player.x, mean(cursor[]) + small_offset)`,
+  using the mean cursor position so a single surging row doesn't yank
+  the camera. The cursor's leading edge is always visible when the
+  player is close to it.
+- **Effect on terrain.** Cells the cursor sweeps over become free space
   (read away) for visual continuity. Optimized blocks (`O`) might be left
   alone — TBD during implementation tuning.
-- **Effect on enemies:** Enemies are also read away when the cursor reaches
-  their column; this lets a clever player wait out an enemy at the cost of
-  losing lead time.
+- **Effect on enemies.** Enemies are also read away when the cursor in
+  their row reaches their column; this lets a clever player wait out an
+  enemy at the cost of losing lead time.
 
 ## Enemies (processes)
 
@@ -356,8 +377,10 @@ Top-level states: `boot` → `menu` → `playing` → (`paused` | `dying` |
   block until it expires, `w` is still empty until it solidifies.
 - Fragile (`F`) is solid until stepped on, then transitions to "cracked"
   (visual change), then on the next step transitions to free.
-- Defrag cursor occupies one column at a time; collision check is just
-  `player.column < cursor.column` → death.
+- Defrag cursor is per-row (jagged front, see Threat section); collision
+  check is `cursor[player.row] >= player.column` → death. The check uses
+  the cursor's value in the player's specific row, not the leading row
+  overall — this is what makes vertical lane choice meaningful.
 
 ## Audio
 
