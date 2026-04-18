@@ -21,6 +21,12 @@ const LETHAL = new Set([TILE.BAD]);
 export const isSolid  = (t) => SOLID.has(t);
 export const isLethal = (t) => LETHAL.has(t);
 
+// Cells that the defrag operation will read/relocate (i.e. mutable terrain).
+const VOLATILE = new Set([
+  TILE.CYAN_SOLID, TILE.CYAN_DIAG, TILE.CYAN_DOTS, TILE.OPT,
+]);
+export const isVolatileSolid = (t) => VOLATILE.has(t);
+
 const CHAR_TO_TILE = {
   '.': TILE.FREE,
   '~': TILE.CYAN_SOLID,

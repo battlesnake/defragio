@@ -2,7 +2,7 @@ import { createPlayer } from './player/state.js';
 import { applyGravity, integrate, applyHorizontalIntent } from './player/physics.js';
 import { startJump, releaseJump } from './player/jump.js';
 import { resolveCollisions } from './world/collision.js';
-import { createCursor, advanceCursor, cursorAtRow } from './world/cursor.js';
+import { createDefrag, advanceDefrag } from './world/defrag.js';
 import { createJumpBuffer, recordJumpPress, recordLeftGround, tickBuffer, canJump, clearJump } from './input/buffer.js';
 import { consumeEdges } from './input/keystate.js';
 import { isLethal, isCheckpoint, isGoal } from './world/tile.js';
@@ -11,13 +11,27 @@ import { spawnEnemies, tickEnemies } from './enemies/registry.js';
 import { play } from './audio/sounds.js';
 import { CONFIG } from './config.js';
 
+// Snapshot the original tile data so we can reset on respawn (defrag mutates it).
+function snapshotTiles(level) {
+  return level.tiles.map(row => row.slice());
+}
+function restoreTiles(level, snapshot) {
+  for (let r = 0; r < snapshot.length; r++) {
+    for (let c = 0; c < snapshot[r].length; c++) {
+      level.tiles[r][c] = snapshot[r][c];
+    }
+  }
+}
+
 export function createGameState(level) {
+  const tilesSnapshot = snapshotTiles(level);
   return {
     level,
+    tilesSnapshot,
     player: createPlayer(level.playerStart),
-    cursor: createCursor({
+    defrag: createDefrag({
       levelId: level.id,
-      height: level.height,
+      level,
       speed: level.cursorSpeed,
       initialOffset: CONFIG.CURSOR_INITIAL_OFFSET,
     }),
@@ -34,7 +48,7 @@ export function createGameState(level) {
 export function tick(game, dt, keystate) {
   if (game.state !== 'playing') return;
 
-  const { player, cursor, jumpBuffer, level } = game;
+  const { player, defrag, jumpBuffer, level } = game;
   game.t += dt;
   tickBuffer(jumpBuffer, game.t);
 
@@ -60,13 +74,13 @@ export function tick(game, dt, keystate) {
 
   if (wasOnGround && !player.onGround) recordLeftGround(jumpBuffer, game.t);
 
+  // Defrag operation runs only after start delay
   if (game.t > CONFIG.CURSOR_START_DELAY_SEC) {
-    advanceCursor(cursor, dt);
+    advanceDefrag(defrag, dt);
   }
 
-  // --- Enemies ---
+  // Enemies
   tickEnemies(game.enemies, dt);
-
   for (const e of game.enemies) {
     if (!e.alive) continue;
     if (Math.abs(e.x - player.x) < 0.6 && Math.abs(e.y - player.y) < 0.6) {
@@ -80,7 +94,7 @@ export function tick(game, dt, keystate) {
     }
   }
 
-  // --- Touch detection: checkpoint, goal, lethal ---
+  // Touch detection
   const cellRow = Math.floor(player.y);
   const cellCol = Math.floor(player.x);
   if (cellRow >= 0 && cellRow < level.height && cellCol >= 0 && cellCol < level.width) {
@@ -99,10 +113,15 @@ export function tick(game, dt, keystate) {
     }
   }
 
-  // --- Cursor catch ---
-  const cursorX = cursorAtRow(cursor, cellRow);
-  if (cursorX >= player.x) {
-    die(game, 'cursor');
+  // Player falls off the bottom of the level → death
+  if (player.y > level.height + 2) {
+    die(game, 'fell');
+    return;
+  }
+
+  // Defrag front overtakes player → death
+  if (defrag.front >= player.x) {
+    die(game, 'defrag');
     return;
   }
 }
@@ -116,16 +135,18 @@ function die(game, reason) {
     game.state = 'gameover';
     return;
   }
+  // Restore the level (undo defrag mutations) and recreate state
+  restoreTiles(game.level, game.tilesSnapshot);
   const cp = lastCheckpoint(game.checkpoints);
-  const newPlayer = createPlayer(cp);
-  game.cursor = createCursor({
+  game.player = createPlayer(cp);
+  game.defrag = createDefrag({
     levelId: game.level.id,
-    height: game.level.height,
+    level: game.level,
     speed: game.level.cursorSpeed,
     initialOffset: CONFIG.CURSOR_INITIAL_OFFSET,
   });
-  game.player = newPlayer;
   game.jumpBuffer = createJumpBuffer();
+  game.enemies = spawnEnemies(game.level);
   game.t = 0;
   game.state = 'playing';
 }

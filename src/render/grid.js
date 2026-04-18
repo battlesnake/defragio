@@ -1,7 +1,6 @@
 import { cellClassFor } from '../world/tile.js';
-import { cursorAtRow } from '../world/cursor.js';
+import { defragOpAt } from '../world/defrag.js';
 
-// Creates a fixed pool of cells sized to viewport. Repaints by setting className.
 export function createGridRenderer({ container, viewportCols, viewportRows, cellWidth = 10, cellHeight = 14 }) {
   container.innerHTML = '';
   const grid = document.createElement('div');
@@ -21,19 +20,11 @@ export function createGridRenderer({ container, viewportCols, viewportRows, cell
   }
   container.appendChild(grid);
 
-  return {
-    cells,
-    viewportCols,
-    viewportRows,
-    cellWidth,
-    cellHeight,
-    grid,
-  };
+  return { cells, viewportCols, viewportRows, cellWidth, cellHeight, grid };
 }
 
-// Paints the visible window: tiles → cursor cells → enemies → player.
-// Camera.x is integer (tile-snapped), no sub-pixel transform.
-export function paintGrid(renderer, level, camera, cursor, enemies = [], player = null) {
+// Paint order: tiles → defrag op cells (read/write tells) → enemies → player.
+export function paintGrid(renderer, level, camera, defrag, enemies = [], player = null) {
   const { cells, viewportCols, viewportRows } = renderer;
   const xOffset = camera.x;
 
@@ -49,18 +40,20 @@ export function paintGrid(renderer, level, camera, cursor, enemies = [], player 
     }
   }
 
-  // 2. Cursor (one cell per row at floor(cursorAtRow))
-  if (cursor) {
-    for (let r = 0; r < cursor.height && r < viewportRows; r++) {
-      const cursorWorldCol = Math.floor(cursorAtRow(cursor, r));
-      const localCol = cursorWorldCol - xOffset;
-      if (localCol >= 0 && localCol < viewportCols) {
-        cells[r * viewportCols + localCol].className = 'cell cell--cursor';
+  // 2. Defrag op tells (read/write flashes; cells are still solid/free per tile during the tell)
+  if (defrag) {
+    for (let r = 0; r < viewportRows; r++) {
+      for (let c = 0; c < viewportCols; c++) {
+        const worldCol = xOffset + c;
+        if (worldCol < 0 || worldCol >= level.width) continue;
+        const op = defragOpAt(defrag, r, worldCol);
+        if (op === 'read')  cells[r * viewportCols + c].className = 'cell cell--read';
+        if (op === 'write') cells[r * viewportCols + c].className = 'cell cell--write';
       }
     }
   }
 
-  // 3. Enemies (overwrite the cell at floor(e.x), floor(e.y))
+  // 3. Enemies
   for (const e of enemies) {
     if (!e.alive) continue;
     const worldCol = Math.floor(e.x);
@@ -71,7 +64,7 @@ export function paintGrid(renderer, level, camera, cursor, enemies = [], player 
     }
   }
 
-  // 4. Player (always on top)
+  // 4. Player on top
   if (player) {
     const worldCol = Math.floor(player.x);
     const worldRow = Math.floor(player.y);

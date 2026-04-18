@@ -1,7 +1,7 @@
 import { CONFIG } from './config.js';
 import { loadLevel } from './world/level-loader.js';
 import { createGameState, tick } from './game.js';
-import { createCamera, updateCamera } from './render/camera.js';
+import { createCamera, updateCamera, resetCamera } from './render/camera.js';
 import { createGridRenderer, paintGrid } from './render/grid.js';
 import { bindChrome, updateChrome } from './render/chrome.js';
 import { loadSounds } from './audio/sounds.js';
@@ -32,6 +32,7 @@ loadSounds({
 const FIXED_DT = 1 / 60;
 let acc = 0;
 let last = performance.now() / 1000;
+let prevState = game.state;
 
 function frame(now) {
   const t = now / 1000;
@@ -42,8 +43,13 @@ function frame(now) {
     tick(game, FIXED_DT, keystate);
     acc -= FIXED_DT;
   }
+  // On respawn, reset the camera back to origin
+  if (prevState !== 'playing' && game.state === 'playing') {
+    resetCamera(camera);
+  }
+  prevState = game.state;
   updateCamera(camera, game.player);
-  paintGrid(renderer, level, camera, game.cursor, game.enemies, game.player);
+  paintGrid(renderer, level, camera, game.defrag, game.enemies, game.player);
   updateChrome(game);
   requestAnimationFrame(frame);
 }
