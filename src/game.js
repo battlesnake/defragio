@@ -379,15 +379,15 @@ function die(game, reason, camera) {
   game.deathReason = reason;
   game.deathCamera = camera;
 
-  // Mario-style bounce for every death cause.
+  // Mario-style bounce for every death cause. The transition to 'dying'
+  // (and the death-text animation) happens later in tick() once the player
+  // has clipped off the bottom of the map.
   game.state = 'death-bounce';
   game.player.vx = 0;
-  game.player.vy = -28;
+  game.player.vy = -22;
   game.player.onGround = false;
   game.player.jumping = false;
-  game.player.invulnTime = 1e9;
-  game.state = 'dying';
-  startDeathTextAnimation(game, camera);
+  game.player.invulnTime = 0;
 }
 
 function startDeathTextAnimation(game, camera) {
