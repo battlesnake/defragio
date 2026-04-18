@@ -8,6 +8,7 @@ import { consumeEdges } from './input/keystate.js';
 import { isLethal, isCheckpoint, isGoal } from './world/tile.js';
 import { createCheckpointTracker, recordCheckpoint, lastCheckpoint } from './world/checkpoint.js';
 import { spawnEnemies, tickEnemies } from './enemies/registry.js';
+import { play } from './audio/sounds.js';
 
 export function createGameState(level) {
   return {
@@ -84,6 +85,7 @@ export function tick(game, dt, keystate) {
       recordCheckpoint(game.checkpoints, { row: cellRow, col: cellCol });
     }
     if (isGoal(here)) {
+      play('levelComplete');
       game.state = 'won';
       return;
     }
@@ -99,6 +101,7 @@ export function tick(game, dt, keystate) {
 
 function die(game, reason) {
   game.lives -= 1;
+  play('death');
   game.state = 'dying';
   game.deathReason = reason;
   if (game.lives <= 0) {

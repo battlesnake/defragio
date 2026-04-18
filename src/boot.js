@@ -7,6 +7,7 @@ import { createPlayerSprite, positionPlayerSprite } from './render/player-sprite
 import { createCursorSprite, positionCursorSprite } from './render/cursor-sprite.js';
 import { createEnemyRenderer, paintEnemies } from './render/enemy-sprite.js';
 import { bindChrome, updateChrome } from './render/chrome.js';
+import { loadSounds } from './audio/sounds.js';
 import { createKeyState, attachKeyState } from './input/keystate.js';
 import level1 from '../levels/level1.js';
 
@@ -38,6 +39,10 @@ const enemyRenderer = createEnemyRenderer(overlay);
 const keystate = createKeyState();
 attachKeyState(keystate);
 bindChrome();
+loadSounds({
+  death:         'assets/audio/death.wav',
+  levelComplete: 'assets/audio/level-complete.wav',
+});
 
 const FIXED_DT = 1 / 60;
 let acc = 0;
