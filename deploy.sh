@@ -7,10 +7,12 @@
 #   ./deploy.sh --status    # show remote caddy status + recent logs
 #
 # Override via env:
-#   DEFRAG_HOST    (default 68.183.33.59)
-#   DEFRAG_USER    (default root)
-#   DEFRAG_DOMAIN  (default <host>.nip.io)
-#   DEFRAG_ROOT    (default /var/www/defrag)
+#   DEFRAG_HOST         (default 68.183.33.59)
+#   DEFRAG_USER         (default root)
+#   DEFRAG_DOMAIN       (default defrag.hackology.co.uk)
+#   DEFRAG_VIBE_DOMAIN  (default vibe.hackology.co.uk)
+#   DEFRAG_EMAIL        (Let's Encrypt registration / cert recovery)
+#   DEFRAG_ROOT         (default /var/www/defrag)
 #
 # Requires: ssh + rsync locally; Debian/Ubuntu on the remote.
 
@@ -18,7 +20,9 @@ set -euo pipefail
 
 DEFRAG_HOST="${DEFRAG_HOST:-68.183.33.59}"
 DEFRAG_USER="${DEFRAG_USER:-root}"
-DEFRAG_DOMAIN="${DEFRAG_DOMAIN:-${DEFRAG_HOST}.nip.io}"
+DEFRAG_DOMAIN="${DEFRAG_DOMAIN:-defrag.hackology.co.uk}"
+DEFRAG_VIBE_DOMAIN="${DEFRAG_VIBE_DOMAIN:-vibe.hackology.co.uk}"
+DEFRAG_EMAIL="${DEFRAG_EMAIL:-mark@battlesnake.co.uk}"
 DEFRAG_ROOT="${DEFRAG_ROOT:-/var/www/defrag}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -27,10 +31,10 @@ cd "$SCRIPT_DIR"
 ssh_target="$DEFRAG_USER@$DEFRAG_HOST"
 
 cmd_setup() {
-  echo "==> Setting up $ssh_target ($DEFRAG_DOMAIN)"
+  echo "==> Setting up $ssh_target ($DEFRAG_DOMAIN, $DEFRAG_VIBE_DOMAIN)"
   # heredoc is sent over ssh; runs as root on the remote.
   ssh -o StrictHostKeyChecking=accept-new "$ssh_target" \
-    "DEFRAG_DOMAIN='$DEFRAG_DOMAIN' DEFRAG_ROOT='$DEFRAG_ROOT' bash -s" <<'REMOTE'
+    "DEFRAG_DOMAIN='$DEFRAG_DOMAIN' DEFRAG_VIBE_DOMAIN='$DEFRAG_VIBE_DOMAIN' DEFRAG_EMAIL='$DEFRAG_EMAIL' DEFRAG_ROOT='$DEFRAG_ROOT' bash -s" <<'REMOTE'
 set -euo pipefail
 
 # Install Caddy from the official repo if not present.
@@ -53,13 +57,14 @@ fi
 mkdir -p "$DEFRAG_ROOT"
 chown -R caddy:caddy "$DEFRAG_ROOT"
 
-# Caddyfile.
+# Caddyfile. Both domains serve the same site for now; vibe will become
+# a multi-game landing page later.
 cat > /etc/caddy/Caddyfile <<CADDYFILE
 {
-  email admin@$DEFRAG_DOMAIN
+  email $DEFRAG_EMAIL
 }
 
-$DEFRAG_DOMAIN {
+$DEFRAG_DOMAIN, $DEFRAG_VIBE_DOMAIN {
   root * $DEFRAG_ROOT
   encode gzip
   file_server
@@ -83,7 +88,9 @@ systemctl --no-pager --lines=5 status caddy || true
 REMOTE
   echo
   echo "==> Setup done. Now run: ./deploy.sh"
-  echo "==> Site will be at: https://$DEFRAG_DOMAIN"
+  echo "==> Site will be at:"
+  echo "      https://$DEFRAG_DOMAIN"
+  echo "      https://$DEFRAG_VIBE_DOMAIN"
 }
 
 cmd_deploy() {
@@ -111,7 +118,9 @@ cmd_deploy() {
   # Make sure caddy can read everything we just dropped in.
   ssh "$ssh_target" "chown -R caddy:caddy '$DEFRAG_ROOT' 2>/dev/null || true"
 
-  echo "==> Deployed → https://$DEFRAG_DOMAIN"
+  echo "==> Deployed →"
+  echo "      https://$DEFRAG_DOMAIN"
+  echo "      https://$DEFRAG_VIBE_DOMAIN"
 }
 
 cmd_status() {
