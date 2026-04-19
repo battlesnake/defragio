@@ -52,6 +52,45 @@ body:not(.is-mobile) .dpad { display: none; }
 .dpad__arrow--left  { left: 6px;   top: 50%;  transform: translateY(-50%); }
 .dpad__arrow--right { right: 6px;  top: 50%;  transform: translateY(-50%); }
 
+/* ─── Jump button (mobile only — visual hint; tap-to-jump anywhere
+       outside the D-pad already works) ──────────────────────────── */
+.jumpbtn {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  width: 110px;
+  height: 110px;
+  z-index: 50;
+  touch-action: none;
+  user-select: none;
+  pointer-events: none; /* taps fall through to the document jump handler */
+}
+body:not(.is-mobile) .jumpbtn { display: none; }
+
+.jumpbtn__ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(192, 192, 192, 0.30);
+  border: 2px solid rgba(0, 0, 0, 0.5);
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.5),
+    inset -1px -1px 0 rgba(0, 0, 0, 0.4);
+}
+.jumpbtn__label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'MS Sans Serif', Tahoma, sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  color: rgba(0, 0, 0, 0.6);
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.4);
+  letter-spacing: 1px;
+}
+
 /* ─── Portrait blocker (mobile + portrait only) ─────────────── */
 .portrait-block {
   display: none;

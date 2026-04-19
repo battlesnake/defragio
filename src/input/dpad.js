@@ -35,12 +35,14 @@ export function attachDpad(keystate) {
     const t  = DEAD_ZONE_FRAC * r;
     setKey(keystate, 'left',  dx < -t);
     setKey(keystate, 'right', dx >  t);
+    setKey(keystate, 'jump',  dy < -t);
     setKey(keystate, 'drop',  dy >  t);
   }
 
   function release() {
     setKey(keystate, 'left',  false);
     setKey(keystate, 'right', false);
+    setKey(keystate, 'jump',  false);
     setKey(keystate, 'drop',  false);
   }
 

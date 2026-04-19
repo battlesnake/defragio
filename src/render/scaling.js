@@ -1,6 +1,8 @@
-// Scale the main defrag window up by an integer factor on large screens
-// so the pixel art stays crisp. Only enlarges (never shrinks below 1x);
-// fractional factors are forbidden to preserve pixel-perfect rendering.
+// Scale the main defrag window to fit the viewport. When enlarging we
+// snap to integer factors so the pixel art stays crisp; when the natural
+// size would overflow the viewport we accept fractional shrinkage (small
+// screens / mobile) — pixel imperfection is less noticeable on high-DPI
+// displays than a clipped-off bottom row.
 
 const FIT_FRACTION = 0.9;
 
@@ -25,7 +27,7 @@ export function attachWindowScaler(selector = '#stage > .win') {
       (vw * FIT_FRACTION) / baseW,
       (vh * FIT_FRACTION) / baseH,
     );
-    const scale = Math.max(1, Math.floor(fitScale));
+    const scale = fitScale >= 1 ? Math.floor(fitScale) : fitScale;
     win.style.transformOrigin = 'center center';
     win.style.transform = scale === 1 ? 'none' : `scale(${scale})`;
   }
