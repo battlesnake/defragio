@@ -90,10 +90,10 @@
           <li><b>Pause</b>: P, or click the Pause button</li>
         </ul>
         <ul class="legend-controls mobile-only">
-          <li><b>Move</b>: tilt the device left or right</li>
-          <li><b>Jump</b>: tap anywhere on the screen (tap again mid-air for a double jump)</li>
+          <li><b>Move</b>: drag your thumb on the D-pad in the bottom-left</li>
+          <li><b>Jump</b>: tap anywhere outside the D-pad (tap again mid-air for a double jump)</li>
           <li><b>Pause</b>: tap the Pause button</li>
-          <li>Hold the device flat when you close this dialog — that becomes your neutral position. Best played in landscape.</li>
+          <li>Best played in landscape.</li>
         </ul>
 
         <h3>Watch for</h3>
@@ -126,7 +126,27 @@
       </div>
     </div>
   </div>
-  <div id="landscape-tip" class="landscape-tip" hidden>Rotate to landscape for the best view</div>
+  <div id="dpad" class="dpad">
+    <div class="dpad__ring"></div>
+    <div class="dpad__arrow dpad__arrow--up">▲</div>
+    <div class="dpad__arrow dpad__arrow--down">▼</div>
+    <div class="dpad__arrow dpad__arrow--left">◀</div>
+    <div class="dpad__arrow dpad__arrow--right">▶</div>
+  </div>
+
+  <div id="portrait-block" class="portrait-block">
+    <div class="win portrait-block__win">
+      <div class="win__titlebar">
+        <div class="win__icon"></div>
+        <div class="win__title">Defragmenting Drive C</div>
+      </div>
+      <div class="win__body portrait-block__body">
+        <div class="portrait-block__icon">⟳</div>
+        <p>Please rotate your device to landscape to play.</p>
+      </div>
+    </div>
+  </div>
+
   <script type="module" src="src/boot.js"></script>
 </body>
 </html>

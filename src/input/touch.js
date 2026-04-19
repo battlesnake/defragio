@@ -1,11 +1,19 @@
-// Tap anywhere on the stage (outside buttons / modals) → jump.
+// Tap anywhere outside the D-pad / buttons / modals → jump.
 // Press on touchstart, release on touchend, so holding the tap gives
 // variable jump height and a fresh tap mid-air triggers double-jump.
+//
+// Listening on the document so taps anywhere on screen count, not just
+// inside the game window.
 
 function isInteractiveTarget(el) {
   while (el && el !== document.body) {
     if (el.tagName === 'BUTTON' || el.tagName === 'A') return true;
-    if (el.classList && (el.classList.contains('win__btn') || el.classList.contains('legend-modal'))) return true;
+    if (el.classList && (
+      el.classList.contains('win__btn') ||
+      el.classList.contains('legend-modal') ||
+      el.classList.contains('dpad') ||
+      el.classList.contains('portrait-block')
+    )) return true;
     el = el.parentElement;
   }
   return false;
@@ -21,19 +29,17 @@ function releaseJump(keystate) {
 }
 
 export function attachTouchInput(keystate) {
-  const stage = document.getElementById('stage') || document.body;
-
-  stage.addEventListener('touchstart', (e) => {
+  document.addEventListener('touchstart', (e) => {
     if (isInteractiveTarget(e.target)) return;
     e.preventDefault();
     pressJump(keystate);
   }, { passive: false });
 
-  stage.addEventListener('touchend', (e) => {
+  document.addEventListener('touchend', (e) => {
     if (isInteractiveTarget(e.target)) return;
     e.preventDefault();
     releaseJump(keystate);
   }, { passive: false });
 
-  stage.addEventListener('touchcancel', () => releaseJump(keystate));
+  document.addEventListener('touchcancel', () => releaseJump(keystate));
 }

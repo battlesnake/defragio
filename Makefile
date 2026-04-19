@@ -5,3 +5,7 @@ deploy:
 .PHONY: status
 status:
 	npm run deploy:status
+
+.PHONY: serve
+serve:
+	python -m http.server 1234

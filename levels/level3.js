@@ -44,14 +44,22 @@ export default {
     { type: 'virus', cell: { row: 12, col: 45 }, patrol: { from: 42, to: 50 } },
   ],
   events: [
-    // Bridges over the wide mid pit
-    { time: 2.0, type: 'write', cells: [
+    // Bridges over the wide mid pit (cols 20-29) — three segments writing
+    // in as the player approaches. Each tell phase ~1s, so timing is tight.
+    { col: 14, type: 'write', cells: [
+      { row: 13, col: 20 }, { row: 13, col: 21 },
+    ] },
+    { col: 16, type: 'write', cells: [
       { row: 13, col: 22 }, { row: 13, col: 23 },
       { row: 13, col: 24 }, { row: 13, col: 25 },
     ] },
-    { time: 2.7, type: 'write', cells: [
+    { col: 20, type: 'write', cells: [
       { row: 13, col: 26 }, { row: 13, col: 27 },
       { row: 13, col: 28 }, { row: 13, col: 29 },
+    ] },
+    // Bridge over the second pit (cols 39-41)
+    { col: 33, type: 'write', cells: [
+      { row: 13, col: 39 }, { row: 13, col: 40 }, { row: 13, col: 41 },
     ] },
     // Staircase up to the high goal. Triggered by the player crossing col 50
     // (so timing matches their arrival regardless of speed). Each tier of

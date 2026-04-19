@@ -131,27 +131,35 @@ export function advanceDefrag(defrag, dt) {
   }
 
   // Top-hat filler timer
+  const intervalMul = defrag.level.tophatIntervalMul ?? 1;
   defrag.tophatT = (defrag.tophatT ?? 0) + dt;
-  while (defrag.tophatT >= TOPHAT_INTERVAL) {
-    defrag.tophatT -= TOPHAT_INTERVAL;
+  const writeInterval = TOPHAT_INTERVAL * intervalMul;
+  while (defrag.tophatT >= writeInterval) {
+    defrag.tophatT -= writeInterval;
     scheduleTophatWrite(defrag);
   }
 
   // Read top-hat (trailing wall that eats lower-row platforms)
   defrag.tophatReadT = (defrag.tophatReadT ?? 0) + dt;
-  while (defrag.tophatReadT >= READ_TOPHAT_INTERVAL) {
-    defrag.tophatReadT -= READ_TOPHAT_INTERVAL;
+  const readIntervalMul = defrag.level.tophatReadIntervalMul ?? 1;
+  const readInterval = READ_TOPHAT_INTERVAL * intervalMul * readIntervalMul;
+  while (defrag.tophatReadT >= readInterval) {
+    defrag.tophatReadT -= readInterval;
     scheduleTophatRead(defrag);
   }
 }
 
 function scheduleTophatWrite(defrag) {
   const { level, front, rng, t } = defrag;
-  const crawlT = Math.max(0, t - TOPHAT_DELAY);
+  const mul = level.tophatSpeedMul ?? 1;
+  const delayMul = level.tophatDelayMul ?? 1;
+  const crawlT = Math.max(0, t - TOPHAT_DELAY * delayMul);
   const frontCap = Math.max(0, Math.floor(front) - TOPHAT_FRONT_BUFFER);
-  const right = Math.min(frontCap, Math.floor(crawlT * TOPHAT_CRAWL_SPEED));
+  const right = Math.min(frontCap, Math.floor(crawlT * TOPHAT_CRAWL_SPEED * mul));
   if (right < 0) return;
-  const left = Math.max(0, right - TOPHAT_WIDTH + 1);
+  const widthMul = level.tophatWidthMul ?? 1;
+  const width = Math.max(1, Math.round(TOPHAT_WIDTH * widthMul));
+  const left = Math.max(0, right - width + 1);
   if (right < left) return;
 
   const startCol = left + Math.floor(rng() * (right - left + 1));
@@ -177,10 +185,14 @@ function scheduleTophatWrite(defrag) {
 
 function scheduleTophatRead(defrag) {
   const { level, rng, t } = defrag;
-  const crawlT = Math.max(0, t - READ_TOPHAT_DELAY);
-  const right = Math.floor(crawlT * READ_TOPHAT_CRAWL_SPEED);
+  const mul = (level.tophatSpeedMul ?? 1) * (level.tophatReadSpeedMul ?? 1);
+  const delayMul = level.tophatDelayMul ?? 1;
+  const crawlT = Math.max(0, t - READ_TOPHAT_DELAY * delayMul);
+  const right = Math.floor(crawlT * READ_TOPHAT_CRAWL_SPEED * mul);
   if (right < 0) return;
-  const left = Math.max(0, right - READ_TOPHAT_WIDTH + 1);
+  const widthMul = level.tophatWidthMul ?? 1;
+  const width = Math.max(1, Math.round(READ_TOPHAT_WIDTH * widthMul));
+  const left = Math.max(0, right - width + 1);
   if (right < left) return;
 
   const startCol = left + Math.floor(rng() * (right - left + 1));

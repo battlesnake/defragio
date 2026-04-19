@@ -8,6 +8,12 @@ export default {
   id: 4,
   name: 'Decay',
   cursorSpeed: 5.5,
+  tophatSpeedMul: 1.8,
+  tophatReadSpeedMul: 3.0,
+  tophatDelayMul: 0.1,
+  tophatIntervalMul: 0.55,
+  tophatReadIntervalMul: 0.30,
+  tophatWidthMul: 3,
   width: 60,
   height: 16,
   grid: [

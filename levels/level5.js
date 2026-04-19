@@ -30,6 +30,11 @@ export default {
   id: 5,
   name: 'Maelstrom',
   cursorSpeed: 7.0,
+  tophatSpeedMul: 1.8,
+  tophatReadSpeedMul: 1.5,
+  tophatDelayMul: 0.1,
+  tophatIntervalMul: 0.55,
+  tophatReadIntervalMul: 0.30,
   width: 60,
   height: 16,
   grid: [
@@ -67,15 +72,46 @@ export default {
     { type: 'virus', cell: { row: 12, col: 32 }, patrol: { from: 28, to: 36 } },
   ],
   events: [
-    // Bridge over the first wide pit
-    { time: 1.5, type: 'write', cells: [
+    // ── Bridges (write in as player approaches each pit) ──────────────
+    // Pit 1 (cols 11-13)
+    { col: 5, type: 'write', cells: [
+      { row: 13, col: 11 }, { row: 13, col: 12 }, { row: 13, col: 13 },
+    ] },
+    // Pit 2 (cols 22-25) — middle pit
+    { col: 16, type: 'write', cells: [
+      { row: 13, col: 22 }, { row: 13, col: 23 },
+      { row: 13, col: 24 }, { row: 13, col: 25 },
+    ] },
+    // Original mid bridge (kept — alt segment higher in the pit)
+    { col: 18, type: 'write', cells: [
       { row: 13, col: 25 }, { row: 13, col: 26 }, { row: 13, col: 27 },
     ] },
-    // Stepping stone at (11, 46): appears just before player arrives at the
-    // wall (~t=5s based on speed 8 + obstacles). Without this the wall is
-    // unjumpable; with it, the player can land on the step then double-jump
-    // over the wall onto the floor at col 48+.
-    { time: 4.8, type: 'write', cells: [{ row: 11, col: 46 }] },
+    // Pit 3 (cols 34-36)
+    { col: 28, type: 'write', cells: [
+      { row: 13, col: 34 }, { row: 13, col: 35 }, { row: 13, col: 36 },
+    ] },
+
+    // ── Wall climb (cols approaching 47) ──────────────────────────────
+    // Lower step first, then a higher one — staircase write-in just in time.
+    { col: 36, type: 'write', cells: [{ row: 12, col: 45 }] },
+    { col: 38, type: 'write', cells: [{ row: 11, col: 46 }] },
+    { col: 40, type: 'write', cells: [{ row: 10, col: 45 }] },
+
+    // ── Alternative high path at row 8 (easier traversal but writes in
+    //    just in time, so committing to it costs precious seconds — if the
+    //    reads catch up, the floor under the launch point is gone). ──
+    { col: 11, type: 'write', cells: [
+      { row: 8, col: 17 }, { row: 8, col: 18 }, { row: 8, col: 19 },
+      { row: 8, col: 20 }, { row: 8, col: 21 }, { row: 8, col: 22 },
+    ] },
+    { col: 21, type: 'write', cells: [
+      { row: 8, col: 27 }, { row: 8, col: 28 }, { row: 8, col: 29 },
+      { row: 8, col: 30 }, { row: 8, col: 31 }, { row: 8, col: 32 },
+    ] },
+    { col: 31, type: 'write', cells: [
+      { row: 8, col: 37 }, { row: 8, col: 38 }, { row: 8, col: 39 },
+      { row: 8, col: 40 }, { row: 8, col: 41 }, { row: 8, col: 42 },
+    ] },
     // Falling-apart decay
     { time: 1.5, type: 'read', cells: [
       { row: 13, col: 6 }, { row: 13, col: 7 },
