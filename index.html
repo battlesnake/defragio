@@ -2,12 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <title>Defragmenting Drive C</title>
   <link rel="icon" type="image/webp" href="assets/defrag-icon.webp">
   <link rel="stylesheet" href="styles/layout.css">
   <link rel="stylesheet" href="styles/chrome.css">
   <link rel="stylesheet" href="styles/grid.css">
   <link rel="stylesheet" href="styles/sprites.css">
+  <link rel="stylesheet" href="styles/mobile.css">
 </head>
 <body>
   <div id="stage">
@@ -83,9 +85,15 @@
         <p>Reach the magenta <span class="legend-swatch swatch--goal"></span> goal stripe at the right edge of each level. Five levels in total. Coins give you points and some protection.</p>
 
         <h3>Controls</h3>
-        <ul class="legend-controls">
+        <ul class="legend-controls desktop-only">
           <li><b>Move / Jump / Duck</b>: Arrow keys / WASD, as you prefer (Space also jumps; tap again mid-air for a double jump)</li>
           <li><b>Pause</b>: P, or click the Pause button</li>
+        </ul>
+        <ul class="legend-controls mobile-only">
+          <li><b>Move</b>: tilt the device left or right</li>
+          <li><b>Jump</b>: tap anywhere on the screen (tap again mid-air for a double jump)</li>
+          <li><b>Pause</b>: tap the Pause button</li>
+          <li>Hold the device flat when you close this dialog — that becomes your neutral position. Best played in landscape.</li>
         </ul>
 
         <h3>Watch for</h3>
@@ -118,6 +126,7 @@
       </div>
     </div>
   </div>
+  <div id="landscape-tip" class="landscape-tip" hidden>Rotate to landscape for the best view</div>
   <script type="module" src="src/boot.js"></script>
 </body>
 </html>

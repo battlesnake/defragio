@@ -1,0 +1,39 @@
+/* Prevent iOS/Android double-tap zoom and gesture interference. The
+   viewport meta in index.html disables pinch-zoom; touch-action stops
+   the browser from waiting 300ms for a possible double-tap. */
+html, body {
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  overscroll-behavior: none;
+}
+
+/* Win98-style "rotate to landscape" tip. Only shown on mobile + portrait. */
+.landscape-tip {
+  position: fixed;
+  left: 50%;
+  bottom: 12px;
+  transform: translateX(-50%);
+  background: #ffffe1;
+  color: #000;
+  border: 1px solid #000;
+  box-shadow: 1px 1px 0 #808080;
+  padding: 3px 8px;
+  font-family: 'MS Sans Serif', Tahoma, sans-serif;
+  font-size: 11px;
+  z-index: 200;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.landscape-tip[hidden] { display: none; }
+
+/* Default: hidden everywhere. Mobile coordinator sets data-mobile and
+   the tip becomes eligible to be shown (still gated by orientation). */
+body:not(.is-mobile) .landscape-tip { display: none !important; }
+
+/* Show one set of instructions per device class. */
+.mobile-only { display: none; }
+body.is-mobile .desktop-only { display: none; }
+body.is-mobile .mobile-only  { display: revert; }

@@ -6,6 +6,11 @@ const MODALS = ['legend', 'controls', 'about'];
 
 let pauseBtn = null;
 const modalEls = {};
+const controlsCloseListeners = [];
+
+export function registerOnControlsClose(cb) {
+  controlsCloseListeners.push(cb);
+}
 
 export function bindButtons(game) {
   pauseBtn = document.getElementById('btn-pause');
@@ -73,6 +78,9 @@ function closeModal(game, name) {
   if (game.pausedFromModal) {
     game.pausedFromModal = false;
     togglePause(game);
+  }
+  if (name === 'controls') {
+    for (const cb of controlsCloseListeners) cb();
   }
 }
 

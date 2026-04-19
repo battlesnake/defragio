@@ -7,6 +7,8 @@ import { loadSounds } from './audio/sounds.js';
 import { createKeyState, attachKeyState } from './input/keystate.js';
 import { attachCheatListener } from './input/cheat.js';
 import { bindButtons, syncPauseButton, openControls } from './render/buttons.js';
+import { initMobile } from './input/mobile.js';
+import { attachWindowScaler } from './render/scaling.js';
 
 const game = createGameState();
 
@@ -25,6 +27,8 @@ attachKeyState(keystate);
 attachCheatListener(game, camera);
 bindChrome();
 bindButtons(game);
+initMobile(keystate);
+attachWindowScaler();
 openControls(game);
 loadSounds({
   death:         'assets/audio/death.wav',

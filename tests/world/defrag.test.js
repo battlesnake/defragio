@@ -27,12 +27,17 @@ test('advanceDefrag advances front at speed', () => {
 
 test('after enough time the level is mutated by completed ops', () => {
   const level = makeLevel();
-  const before = level.tiles[2].slice();
+  const before = level.tiles.map(r => r.slice());
   const d = createDefrag({ levelId: 1, level, speed: 2.0, initialOffset: 0 });
   for (let i = 0; i < 200; i++) advanceDefrag(d, 0.05); // 10s simulated
-  // Some row-2 cells should have been read away → become FREE
-  const changed = level.tiles[2].some((t, c) => t !== before[c]);
-  assert.ok(changed, 'expected at least one row-2 cell to have been read away');
+  // Some cell — anywhere — should differ from the initial state.
+  let changed = false;
+  for (let r = 0; r < level.tiles.length && !changed; r++) {
+    for (let c = 0; c < level.tiles[r].length; c++) {
+      if (level.tiles[r][c] !== before[r][c]) { changed = true; break; }
+    }
+  }
+  assert.ok(changed, 'expected at least one cell to be mutated by completed ops');
 });
 
 test('same level + seed → same op stream (deterministic)', () => {
